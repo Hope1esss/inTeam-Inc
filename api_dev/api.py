@@ -42,5 +42,3 @@ def vk_get_info(*ids):
 info = vk_get_info(
     "unelzit", "paintingpromises", "viktorius11", "finleyl", "we1lman", "tutaev09"
 )
-
-print(info)
