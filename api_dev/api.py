@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+import csv
 
 load_dotenv()
 
@@ -12,7 +13,7 @@ load_dotenv()
 def vk_get_main_info(*ids):
     token = os.getenv("TOKEN")
     version = 5.89
-    user_ids = " ,".join(ids)[:-1]
+    user_ids = ", ".join(ids)[:-1]
     # fields = "activities,about,blacklisted,blacklisted_by_me,books,bdate,can_be_invited_group,
     # can_post,can_see_all_posts,can_see_audio,can_send_friend_request,can_write_private_message,
     # career,common_count,connections,contacts,city,country,crop_photo,domain,education,exports,
@@ -43,34 +44,43 @@ def vk_get_main_info(*ids):
     return data
 
 
-def vk_get_wall(id):
-    token = os.getenv("TOKEN")
-    version = 5.137
-    user_id = id
-    count_of_wall = 100
-    post_type = "all"
-    additional_fields = 1  # 1 = True, 0 = False
-    #  1 — в ответе будут возвращены дополнительные поля profiles и groups,
-    # содержащие информацию о пользователях и сообществах. По умолчанию: 0.
-    additional_fields_params = "id"
-    all_posts = []
-    offset = 0
-    while offset < 1000:
-        response = requests.get(
-            "https://api.vk.com/method/wall.get",
-            params={
-                "access_token": token,
-                "v": version,
-                "owner_id": user_id,
-                "count": count_of_wall,
-                "filter": post_type,
-                "extended": additional_fields,
-                "fields": additional_fields_params,
-                "offset": offset,
-            },
-            timeout=100,
-        )
-        data = response.json()["response"]["items"]
-        offset += 100
-        all_posts.extend(data)
-    
+# def vk_get_wall(user):
+#     token = os.getenv("TOKEN")
+#     version = 5.137
+#     user_id = user
+#     count_of_wall = 100
+#     post_type = "all"
+#     additional_fields = 1  # 1 = True, 0 = False
+#     #  1 — в ответе будут возвращены дополнительные поля profiles и groups,
+#     # содержащие информацию о пользователях и сообществах. По умолчанию: 0.
+#     additional_fields_params = "id"
+#     all_posts = []
+#     offset = 0
+#     while offset < 1000:
+#         response = requests.get(
+#             "https://api.vk.com/method/wall.get",
+#             params={
+#                 "access_token": token,
+#                 "v": version,
+#                 "owner_id": user_id,
+#                 "count": count_of_wall,
+#                 "filter": post_type,
+#                 "extended": additional_fields,
+#                 "fields": additional_fields_params,
+#                 "offset": offset,
+#             },
+#             timeout=100,
+#         )
+#         data = response.json()["response"]["items"]
+#         offset += 100
+#         all_posts.extend(data)
+#     return all_posts
+
+# def file_writer(all_posts):
+#     with open("file.cvs", "w") as file:
+#         pen = csv.writer(file)
+#         pen.writerow("likes", "body", "url")
+#         for post in all_posts:
+#             pen.writerow()
+
+vk_get_main_info("unelzit", "264457326")
