@@ -1,4 +1,4 @@
 ids = ("unelzit", "paintingpromises", "viktorius11", "finleyl", "we1lman", "tutaev09")
 
-user_ids = " ,".join(ids)[:-1]
-print(user_ids)
+USER_IDS = " ,".join(ids)[:-1]
+print(USER_IDS)

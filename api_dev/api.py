@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 # def vk_parser():
 #     vk_get_main_info()
 #     vk_get_wall()
@@ -73,4 +74,7 @@ def vk_get_wall(id):
         data = response.json()["response"]["items"]
         offset += 100
         all_posts.extend(data)
-    
+
+
+ids = ("unelzit", "paintingpromises", "viktorius11", "finleyl", "we1lman", "tutaev09")
+vk_get_main_info(*ids)
