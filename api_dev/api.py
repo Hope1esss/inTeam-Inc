@@ -39,6 +39,4 @@ def vk_get_info(*ids):
     return data
 
 
-info = vk_get_info(
-    "unelzit", "paintingpromises", "viktorius11", "finleyl", "we1lman", "tutaev09"
-)
+info = vk_get_info("unelzit", "paintingpromises", "viktorius11", "finleyl", "we1lman")
