@@ -97,6 +97,6 @@ def file_writer(all_posts):
                 pass
 
 
-all_posts = vk_get_wall()
+all_posts = vk_get_wall("darona113")
 file_writer(all_posts)
 print(1)
