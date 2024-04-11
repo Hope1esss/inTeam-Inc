@@ -1,7 +1,7 @@
 import os
+import csv
 import requests
 from dotenv import load_dotenv
-import csv
 
 load_dotenv()
 
@@ -77,12 +77,11 @@ def vk_get_wall(user):
         data = response.json()["response"]["items"]
         offset += 100
         all_posts.extend(data)
-
     return all_posts
 
 
 def file_writer(all_posts):
-    with open("file1.cvs", "w") as file:
+    with open("file1.cvs", "w", encoding="utf-8") as file:
         pen = csv.writer(file)
         pen.writerow(["likes", "body", "url"])
         for post in all_posts:
@@ -91,14 +90,14 @@ def file_writer(all_posts):
                     img_url = post["attachments"][0]["photo"]["sizes"][-1]["url"]
                 else:
                     img_url = "pass"
-            except:
+            except Exception:
                 pass
             try:
                 pen.writerow([post["likes"]["count"], post["text"], img_url])
-            except:
+            except Exception:
                 pass
 
 
-all_posts = vk_get_wall("darona113")
-file_writer(all_posts)
+get_posts = vk_get_wall("darona113")
+file_writer(get_posts)
 print(1)
