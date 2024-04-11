@@ -1,6 +1,7 @@
 import os
 import requests
 from dotenv import load_dotenv
+import csv
 
 load_dotenv()
 
@@ -13,7 +14,8 @@ load_dotenv()
 def vk_get_main_info(*ids):
     token = os.getenv("TOKEN")
     version = 5.89
-    user_ids = " ,".join(ids)[:-1]
+    user_ids = ", ".join(ids)
+    ru = 0
     # fields = "activities,about,blacklisted,blacklisted_by_me,books,bdate,can_be_invited_group,
     # can_post,can_see_all_posts,can_see_audio,can_send_friend_request,can_write_private_message,
     # career,common_count,connections,contacts,city,country,crop_photo,domain,education,exports,
@@ -30,6 +32,7 @@ def vk_get_main_info(*ids):
             "v": version,
             "user_ids": user_ids,
             "fields": fields,
+            "lang": ru,
         },
         timeout=100,
     )
@@ -44,10 +47,10 @@ def vk_get_main_info(*ids):
     return data
 
 
-def vk_get_wall(id):
+def vk_get_wall(user):
     token = os.getenv("TOKEN")
     version = 5.137
-    user_id = id
+    user_id = user
     count_of_wall = 100
     post_type = "all"
     additional_fields = 1  # 1 = True, 0 = False
@@ -56,7 +59,7 @@ def vk_get_wall(id):
     additional_fields_params = "id"
     all_posts = []
     offset = 0
-    while offset < 1000:
+    while offset < 100:
         response = requests.get(
             "https://api.vk.com/method/wall.get",
             params={
@@ -75,6 +78,27 @@ def vk_get_wall(id):
         offset += 100
         all_posts.extend(data)
 
+    return all_posts
 
-ids = ("unelzit", "paintingpromises", "viktorius11", "finleyl", "we1lman", "tutaev09")
-vk_get_main_info(*ids)
+
+def file_writer(all_posts):
+    with open("file1.cvs", "w") as file:
+        pen = csv.writer(file)
+        pen.writerow(["likes", "body", "url"])
+        for post in all_posts:
+            try:
+                if post["attachments"][0]:
+                    img_url = post["attachments"][0]["photo"]["sizes"][-1]["url"]
+                else:
+                    img_url = "pass"
+            except:
+                pass
+            try:
+                pen.writerow([post["likes"]["count"], post["text"], img_url])
+            except:
+                pass
+
+
+all_posts = vk_get_wall()
+file_writer(all_posts)
+print(1)
