@@ -5,6 +5,7 @@ import csv
 
 load_dotenv()
 
+
 # def vk_parser():
 #     vk_get_main_info()
 #     vk_get_wall()
@@ -76,6 +77,7 @@ def vk_get_wall(user):
         data = response.json()["response"]["items"]
         offset += 100
         all_posts.extend(data)
+
     return all_posts
 
 

@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import csv
 import time
 
+
 load_dotenv()
 
 token = os.getenv("TOKEN")
