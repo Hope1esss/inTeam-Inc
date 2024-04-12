@@ -7,26 +7,31 @@ class Database:
         self.cursor = self.connection.cursor()
         self.cursor.execute("""CREATE TABLE IF NOT EXISTS users(
            login TEXT PRIMARY KEY,
-           hashed_password TEXT);
+           password TEXT);
         """)
 
-    def _already_exists(self, login):
-        self.cursor.execute("SELECT * FROM users WHERE login = ?;", (login,))
-        if self.cursor is not None:
-            return True
-
-    def add_user(self, login, hashed_password):
-        if self._already_exists(login):
-            print('User already exists')
+    def add_user(self, login, password):
+        try:
+            self.cursor.execute("INSERT INTO users(login, password) VALUES(?, ?);", (login, password))
+        except sqlite3.IntegrityError:
             return False
-        self.cursor.execute("INSERT INTO users(login, hashed_password) VALUES(?, ?);", (login, hashed_password))
         self.connection.commit()
 
     def get_password(self, login):
-        self.cursor.execute("SELECT hashed_password FROM users WHERE login =?;", (login,))
-        if self.cursor is not None:
-            return self.cursor.fetchone()[0]
+        try:
+            password = self.cursor.execute("SELECT password FROM users WHERE login =?;", (login,)).fetchone()[0]
+        except TypeError:
+            return False
+        else:
+            return password
+
+    def get_login(self, login):
+        try:
+            login = self.cursor.execute("SELECT login FROM users WHERE login =?;", (login,)).fetchone()[0]
+        except TypeError:
+            return False
+        else:
+            return login
 
     def finish_connection(self):
         self.connection.close()
-

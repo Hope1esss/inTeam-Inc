@@ -1,21 +1,32 @@
-import database
+import database_script
 import bcrypt
 
-class User:
-    def __init__(self, login, password):
-        self.__account = {login: {"password": password, "verification": True}}
 
-    def get_login(self):
-        return list(self.__account.keys())[0]
+class Encryption:
+    def __init__(self, password):
+        self.salt = bcrypt.gensalt()
+        self.hashed_password = bcrypt.hashpw(password.encode('utf-8'), self.salt)
 
-    def get_password(self):
-        login = self.get_login()
-        return self.__account[login]["password"]
+    def check_password(self, password):
+        if bcrypt.checkpw(password.encode('utf-8'), self.hashed_password):
+            return True
+        return False
 
-input_login = input()
-input_password = input()
+    def get_hashed_password(self):
+        return self.hashed_password
 
-users_data = [User(input_login, input_password)]
 
-"hyi.mne.v.rot@yandex.ru"
-"qwerty123"
+class Authentication_system:
+    def __init__(self):
+        self.database = database_script.Database()
+
+    def adding_user(self, login, password):
+        hashed_password = Encryption(password).get_hashed_password()
+        self.database.add_user(login, hashed_password)
+
+    def login(self, login, password):
+        if self.database.get_login(login) == login and bcrypt.checkpw(password.encode('utf-8'),
+                                                                      self.database.get_password(login)):
+            return True
+        return False
+
