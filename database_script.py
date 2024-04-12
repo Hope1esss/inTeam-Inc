@@ -1,4 +1,5 @@
 import sqlite3
+import Errors
 
 
 class Database:
@@ -14,7 +15,7 @@ class Database:
         try:
             self.cursor.execute("INSERT INTO users(login, password) VALUES(?, ?);", (login, password))
         except sqlite3.IntegrityError:
-            return False
+            raise Errors.UserAlreadyExistsError
         self.connection.commit()
 
     def get_password(self, login):
