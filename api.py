@@ -86,4 +86,3 @@ class Api:
                     pen.writerow([post["likes"]["count"], post["text"], img_url])
                 except:
                     pass
-
