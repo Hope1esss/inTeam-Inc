@@ -90,14 +90,16 @@ def file_writer(all_posts):
                     img_url = post["attachments"][0]["photo"]["sizes"][-1]["url"]
                 else:
                     img_url = "pass"
-            except Exception:
-                pass
+            except:
+                print("error")
             try:
                 pen.writerow([post["likes"]["count"], post["text"], img_url])
-            except Exception:
-                pass
+            except:
+                
+                print("удали файл")
 
-
-get_posts = vk_get_wall("darona113")
+get_posts = vk_get_wall("135153335")
 file_writer(get_posts)
 print(1)
+
+
