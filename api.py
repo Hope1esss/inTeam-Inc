@@ -2,6 +2,7 @@ import os
 import csv
 import requests
 from dotenv import load_dotenv
+import sqlite3
 
 load_dotenv()
 
@@ -29,7 +30,7 @@ class Api:
         # interests,is_favorite,is_friend,is_hidden_from_feed,last_seen,maiden_name,military,movies,
         # music,nickname,occupation,online,personal,photo_id,photo_max,photo_max_orig,quotes,relation,
         # relatives,timezone,tv,universities"
-        fields = "activities,about"
+        fields = "activities,about,sex,bdate,city"
         response = requests.get(
             "https://api.vk.com/method/users.get",
             params={
@@ -45,7 +46,7 @@ class Api:
         data = response.json()
         return data
 
-    def vk_get_wall(self):
+    def vk_get_posts(self):
         version = 5.137
         user_id = self.id
         count_of_wall = 100
@@ -60,7 +61,7 @@ class Api:
             response = requests.get(
                 "https://api.vk.com/method/wall.get",
                 params={
-                    "access_token": self.id,
+                    "access_token": self.token,
                     "v": version,
                     "owner_id": user_id,
                     "count": count_of_wall,
@@ -80,7 +81,7 @@ class Api:
         with open("file1.cvs", "w", encoding="utf-8") as file:
             pen = csv.writer(file)
             pen.writerow(["likes", "body", "url"])
-            for post in self.vk_get_wall():
+            for post in self.vk_get_posts():
                 try:
                     if post["attachments"][0]:
                         img_url = post["attachments"][0]["photo"]["sizes"][-1]["url"]
@@ -92,3 +93,7 @@ class Api:
                     pen.writerow([post["likes"]["count"], post["text"], img_url])
                 except:
                     pass
+
+
+user1 = Api("")
+user1.file_writer()
