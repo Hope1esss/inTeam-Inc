@@ -1,5 +1,5 @@
-import database_script
 import bcrypt
+import database_script
 
 
 class Encryption:
@@ -16,7 +16,7 @@ class Encryption:
         return self.hashed_password
 
 
-class Authentication_system:
+class AuthenticationSystem:
     def __init__(self):
         self.database = database_script.Database()
 
@@ -25,8 +25,7 @@ class Authentication_system:
         self.database.add_user(login, hashed_password)
 
     def login(self, login, password):
-        if self.database.get_login(login) == login and bcrypt.checkpw(password.encode('utf-8'),
-                                                                      self.database.get_password(login)):
+        if self.database.get_login(login) == login and \
+                bcrypt.checkpw(password.encode('utf-8'), self.database.get_password(login)):
             return True
         return False
-

@@ -1,5 +1,5 @@
 import sqlite3
-import Errors
+import errors
 
 
 class Database:
@@ -14,8 +14,8 @@ class Database:
     def add_user(self, login, password):
         try:
             self.cursor.execute("INSERT INTO users(login, password) VALUES(?, ?);", (login, password))
-        except sqlite3.IntegrityError:
-            raise Errors.UserAlreadyExistsError
+        except sqlite3.IntegrityError as exc:
+            raise errors.UserAlreadyExistsError("User already exists") from exc
         self.connection.commit()
 
     def get_password(self, login):
@@ -23,16 +23,14 @@ class Database:
             password = self.cursor.execute("SELECT password FROM users WHERE login =?;", (login,)).fetchone()[0]
         except TypeError:
             return False
-        else:
-            return password
+        return password
 
     def get_login(self, login):
         try:
             login = self.cursor.execute("SELECT login FROM users WHERE login =?;", (login,)).fetchone()[0]
         except TypeError:
             return False
-        else:
-            return login
+        return login
 
     def finish_connection(self):
         self.connection.close()
