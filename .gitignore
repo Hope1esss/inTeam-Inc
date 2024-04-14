@@ -3,5 +3,6 @@
 
 # Исключения для ветки с парсингом
 .env
+file1.csv
 test.py
 test1.py
