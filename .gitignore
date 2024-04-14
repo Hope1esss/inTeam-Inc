@@ -244,7 +244,11 @@ user.db
 
 # Исключения для ветки с парсингом
 .env
+<<<<<<< HEAD
 >>>>>>> 7486c2e (fix posts parser)
+=======
+file1.csv
+>>>>>>> cbe620a (del file1.csv)
 test.py
 test1.py
 >>>>>>> c4228d9 (add new feature: add oop clases, add DababaseWriter)
