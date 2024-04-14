@@ -124,6 +124,7 @@ celerybeat.pid
 
 # Environments
 .env
+<<<<<<< HEAD
 need.env
 .venv
 env/
@@ -233,3 +234,9 @@ fabric.properties
 
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
+=======
+file1.cvs
+user.db
+test.py
+test1.py
+>>>>>>> c4228d9 (add new feature: add oop clases, add DababaseWriter)

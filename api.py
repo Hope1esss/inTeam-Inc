@@ -1,8 +1,8 @@
 import os
 import csv
+import sqlite3
 import requests
 from dotenv import load_dotenv
-import sqlite3
 
 load_dotenv()
 
@@ -18,7 +18,7 @@ class Api:
         self.token = os.getenv("TOKEN")
 >>>>>>> f4f3e6e (update)
 
-    def vk_get_main_info(self):
+    def VKUserInfo(self):
         version = 5.89
         user_ids = self.id
         ru = 0
@@ -30,7 +30,7 @@ class Api:
         # interests,is_favorite,is_friend,is_hidden_from_feed,last_seen,maiden_name,military,movies,
         # music,nickname,occupation,online,personal,photo_id,photo_max,photo_max_orig,quotes,relation,
         # relatives,timezone,tv,universities"
-        fields = "activities,about,sex,bdate,city"
+        fields = "sex,bdate,city,education"
         response = requests.get(
             "https://api.vk.com/method/users.get",
             params={
@@ -44,9 +44,19 @@ class Api:
         )
 
         data = response.json()
-        return data
+        id = data["response"][0]["id"]
+        bdate = data["response"][0].get("bdate", None)
+        city = data["response"][0].get("city", {}).get("title", None)
+        university_name = data["response"][0]["university_name"]
+        ret = self.DatabaseWriter(
+            id,
+            bdate,
+            None if city == "" else city,
+            None if university_name == "" else university_name,
+        )
+        return ret
 
-    def vk_get_posts(self):
+    def VKWallPosts(self):
         version = 5.137
         user_id = self.id
         count_of_wall = 100
@@ -77,7 +87,7 @@ class Api:
             all_posts.extend(data)
         return all_posts
 
-    def file_writer(self):
+    def VKPostsExporter(self):
         with open("file1.cvs", "w", encoding="utf-8") as file:
             pen = csv.writer(file)
             pen.writerow(["likes", "body", "url"])
@@ -94,6 +104,35 @@ class Api:
                 except:
                     pass
 
+    def DatabaseWriter(self, id, date_of_birth, city, education):
+        try:
+            database = sqlite3.connect("user.db")
+            cursor = database.cursor()
+            print("Подключен к SQLite")
+            cursor.execute(
+                """CREATE TABLE IF NOT EXISTS users (
+            id integer PRIMARY KEY,
+            bdate text,
+            city text,
+            education text
+        )"""
+            )
+            sqlite_insert_with_param = """INSERT INTO users
+                                (id, bdate, city, education)
+                                VALUES (?, ?, ?, ?)"""
+            data_tuple = (id, date_of_birth, city, education)
+            cursor.execute(sqlite_insert_with_param, data_tuple)
+            database.commit()
+            print("Переменные Python успешно вставлены в таблицу user.db")
+            cursor.close()
+        except sqlite3.Error as error:
+            print("Ошибка при работе с SQLite", error)
+        finally:
+            if database:
+                database.close()
+                print("Соединение с SQLite закрыто")
+        return 0
 
-user1 = Api("")
-user1.file_writer()
+
+user1 = Api(os.getenv("ID"))
+user1.VKUserInfo()
