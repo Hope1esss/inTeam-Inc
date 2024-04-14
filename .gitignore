@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 app/api/core/config.py
 
 
@@ -237,6 +238,13 @@ fabric.properties
 =======
 file1.cvs
 user.db
+=======
+# Исключение для БД
+*.db
+
+# Исключения для ветки с парсингом
+.env
+>>>>>>> 7486c2e (fix posts parser)
 test.py
 test1.py
 >>>>>>> c4228d9 (add new feature: add oop clases, add DababaseWriter)
