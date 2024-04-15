@@ -552,7 +552,10 @@ files = [
 [package.dependencies]
 astroid = ">=3.1.0,<=3.2.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
-dill = {version = ">=0.3.7", markers = "python_version >= \"3.12\""}
+dill = [
+    {version = ">=0.3.7", markers = "python_version >= \"3.12\""},
+    {version = ">=0.3.6", markers = "python_version >= \"3.11\" and python_version < \"3.12\""},
+]
 isort = ">=4.2.5,<5.13.0 || >5.13.0,<6"
 mccabe = ">=0.6,<0.8"
 platformdirs = ">=2.2.0"
@@ -698,5 +701,5 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.12"
-content-hash = "9b1b7d548d7301560455f4f8dd55fb0c13086a90b51a40f76df05165d6f42fe0"
+python-versions = "^3.11"
+content-hash = "298406b149866b142a77ff2f3b5b16780f5670f26aedfbf848806fb8cc087454"

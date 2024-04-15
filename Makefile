@@ -1,16 +1,18 @@
-.PHONY: lint format-toml test install
+all: inst format lint test
 
-install:
+inst:
 	poetry install --no-root
-lint:
-	poetry run flake8 ./app
-	poetry run pylint ./app
 
 format:
 	poetry run black ./app
 
+lint:
+	poetry run flake8 ./app
+	poetry run pylint ./app
+
 format-toml:
 	poetry run toml-sort pyproject.toml --all --in-place
 
-test:
-	poetry run pytest
+
+
+.PHONY: all inst lint format format-toml test
