@@ -16,7 +16,7 @@ UserAlreadyExistsError
 """
 
 import sqlite3
-import errors
+from . import errors
 
 
 class Database:

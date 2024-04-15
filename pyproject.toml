@@ -1,27 +1,26 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
 [tool.poetry]
-name = "inteam-inc"
-version = "0.1.0"
-description = ""
 authors = ["we1lman <andrey.velma2005@gmail.com>"]
-readme = "README.md"
+description = ""
+name = "inteam-inc"
 package-mode = false
+readme = "README.md"
+version = "0.1.0"
 
 [tool.poetry.dependencies]
-python = "^3.11"
 bcrypt = "^4.1.2"
+fastapi = "^0.110.1"
+pylint = "^3.1.0"
+python = "^3.11"
 python-dotenv = "^1.0.1"
 requests = "^2.31.0"
-pylint = "^3.1.0"
-fastapi = "^0.110.1"
 uvicorn = "^0.29.0"
-
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.0"
-pylint = "^3.1.0"
 flake8 = "^7.0.0"
+pylint = "^3.1.0"
 toml-sort = "^0.23.1"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

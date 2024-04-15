@@ -31,7 +31,7 @@ True
 """
 
 import bcrypt
-import database_script
+from . import database_script
 
 
 class Encryption:
@@ -148,3 +148,10 @@ class AuthenticationSystem:
         user_login = self.database.get_login(login)
         user_password = self.database.get_password(login)
         return user_login == login and bcrypt.checkpw(password.encode('utf-8'), user_password)
+
+    def logout(self):
+        """
+        Выход пользователя из системы.
+        """
+        self.database.finish_connection()
+        self.database = None

@@ -1,4 +1,4 @@
-all: inst format lint test
+all: inst format lint format-toml
 
 inst:
 	poetry install --no-root
@@ -13,6 +13,4 @@ lint:
 format-toml:
 	poetry run toml-sort pyproject.toml --all --in-place
 
-
-
-.PHONY: all inst lint format format-toml test
+.PHONY: all inst lint format format-toml
