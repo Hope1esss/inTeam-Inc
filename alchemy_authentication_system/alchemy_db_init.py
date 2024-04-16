@@ -4,12 +4,12 @@
 import sqlalchemy.orm
 from sqlalchemy import Column, String, create_engine
 
-engine = create_engine('sqlite:///database.db')
+engine = create_engine("sqlite:///database.db")
 Base = sqlalchemy.orm.declarative_base()
 
 
 class User(Base):
-    __tablename__ = 'Users'
+    __tablename__ = "Users"
     login = Column(String, primary_key=True)
     password = Column(String)
 

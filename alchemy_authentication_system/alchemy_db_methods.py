@@ -1,9 +1,9 @@
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 
-import alchemy_db_init
-import encryption
-import errors
+from . import alchemy_db_init
+from . import encryption
+from . import errors
 
 
 class AlchemyDB:

@@ -1,6 +1,6 @@
 import bcrypt
 
-import alchemy_db_methods
+from . import alchemy_db_methods
 
 
 class AuthenticationSystem:
@@ -13,7 +13,7 @@ class AuthenticationSystem:
     def login(self, login, password):
         self.db.get_login(login)
         db_password = self.db.get_password(login)
-        return bcrypt.checkpw(password.encode('utf-8'), db_password)
+        return bcrypt.checkpw(password.encode("utf-8"), db_password)
 
     def logout(self):
         self.db.finish_connection()
