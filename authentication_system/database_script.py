@@ -77,7 +77,8 @@ class Database:
             raise errors.UserAlreadyExistsError(
                 f"Имя пользователя {login} уже используется."
             ) from exc
-        self.connection.commit()
+        finally:
+            self.connection.commit()
 
     def get_password(self, login):
         """

@@ -5,3 +5,7 @@
 .env
 .idea
 file1.cvs
+
+
+#база данных
+database.db

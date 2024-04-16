@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 import authentication_system
 
 router = APIRouter()
@@ -7,7 +7,10 @@ router = APIRouter()
 @router.post("/auth/register")
 async def register(login: str, password: str):
     auth_system = authentication_system.AuthenticationSystem()
-    auth_system.adding_user(login, password)
+    try:
+        auth_system.adding_user(login, password)
+    except authentication_system.errors.UserAlreadyExistsError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return {"message": "User has been registered."}
 
 
