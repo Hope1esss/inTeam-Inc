@@ -3,6 +3,7 @@ from alchemy_authentication_system.auth_system import AuthenticationSystem
 from alchemy_authentication_system.errors import (
     UserAlreadyExistsError,
     UserNotFoundError,
+    WrongPasswordError,
 )
 
 
@@ -24,7 +25,9 @@ async def login(login: str, password: str):
         AuthenticationSystem().login(login, password)
     except UserNotFoundError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return {"message": "Вы успешно вошли в систему."}
+    except WrongPasswordError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"message": "Успешный вход."}
 
 
 @router.post("/auth/logout")

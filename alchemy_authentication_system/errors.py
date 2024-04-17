@@ -41,3 +41,8 @@ class UserAlreadyExistsError(Exception):
 class UserNotFoundError(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+
+class WrongPasswordError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
