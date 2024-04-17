@@ -4,7 +4,7 @@ import os
 import sqlite3
 
 # Assuming api.py is in the same directory
-from api import Api
+from app.api.services.api import Api
 
 class TestApi(unittest.TestCase):
 
