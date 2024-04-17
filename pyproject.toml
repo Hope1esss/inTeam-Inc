@@ -11,8 +11,10 @@ readme = "README.md"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
+aiosqlite = "^0.20.0"
 bcrypt = "^4.1.2"
 fastapi = "^0.110.1"
+fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
 pylint = "^3.1.0"
 python = "^3.11"
 python-dotenv = "^1.0.1"

@@ -8,4 +8,7 @@ file1.cvs
 
 
 #база данных
-database.db
+app/api/db/database.db
+
+
+app/api/core/config.py

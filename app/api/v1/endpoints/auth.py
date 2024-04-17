@@ -1,36 +1,19 @@
-from fastapi import APIRouter, HTTPException
-from alchemy_authentication_system.auth_system import AuthenticationSystem
-from alchemy_authentication_system.errors import (
-    UserAlreadyExistsError,
-    UserNotFoundError,
-    WrongPasswordError,
-)
-
+import uuid
+from fastapi import APIRouter
+from fastapi_users import FastAPIUsers
+from app.api.crud.manager import get_user_manager
+from app.api.db.base import auth_backend
+from app.api.db.init_db import User
+from app.api.schemas.user import UserRead, UserCreate
 
 router = APIRouter()
 
+fastapi_users = FastAPIUsers[User, uuid.UUID](
+    get_user_manager,
+    [auth_backend],
+)
 
-@router.post("/auth/register")
-async def register(login: str, password: str):
-    try:
-        AuthenticationSystem().registration(login, password)
-    except UserAlreadyExistsError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return {"message": "Пользователь успешно зарегистрирован."}
-
-
-@router.post("/auth/login")
-async def login(login: str, password: str):
-    try:
-        AuthenticationSystem().login(login, password)
-    except UserNotFoundError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except WrongPasswordError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return {"message": "Успешный вход."}
-
-
-@router.post("/auth/logout")
-async def logout():
-    AuthenticationSystem().logout()
-    return {"message": "Вы успешно вышли из системы."}
+register_router = fastapi_users.get_register_router(UserRead, UserCreate)
+router.include_router(register_router, tags=["auth"])
+login_router = fastapi_users.get_auth_router(auth_backend)
+router.include_router(login_router, tags=["auth"])
