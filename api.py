@@ -129,7 +129,7 @@ class Api:
             None if university_name_data == "" else university_name_data,
         )
 
-    def vk_wall_posts(self):
+    def _vk_wall_posts(self):
         """
         Получает список записей со стены пользователя ВКонтакте.
 
@@ -172,7 +172,7 @@ class Api:
 
         Файл содержит информацию о количестве лайков, просмотров, тексте записи, URL-адресах изображений и аудиозаписей.
         """
-        os.remove("file1.csv")  # Удаляет существующий файл, если он есть
+        # os.remove("file1.csv")  # Удаляет существующий файл, если он есть
 
         # Открывает файл для записи
         with open("file1.csv", "w", encoding="utf-8") as file:
@@ -261,3 +261,4 @@ class Api:
             if database:
                 database.close()  # Закрывает соединение с базой данных
                 print("Соединение с SQLite закрыто")
+                
