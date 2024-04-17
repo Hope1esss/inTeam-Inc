@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 app/api/core/config.py
 
 
@@ -252,3 +253,13 @@ file1.csv
 test.py
 test1.py
 >>>>>>> c4228d9 (add new feature: add oop clases, add DababaseWriter)
+=======
+# Исключение для БД
+*.db
+
+# Исключения для ветки с парсингом
+.env
+file1.csv
+test.py
+test1.py
+>>>>>>> e99714d2fd2434b8c191ebc10fecfef5620859fd

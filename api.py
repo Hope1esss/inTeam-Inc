@@ -34,10 +34,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 # def vk_parser():
 #     vk_get_main_info()
 #     vk_get_wall()
 =======
+=======
+>>>>>>> e99714d2fd2434b8c191ebc10fecfef5620859fd
 
 class Api:
     """
@@ -74,6 +77,7 @@ class Api:
 
         self.user_id = user_id
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.token = os.getenv("TOKEN")
 >>>>>>> f4f3e6e (update)
 =======
@@ -81,6 +85,11 @@ class Api:
             "TOKEN"
         )  # Получает токен доступа из переменной окружения
 >>>>>>> 902702d (add feature: new comments)
+=======
+        self.token = os.getenv(
+            "TOKEN"
+        )  # Получает токен доступа из переменной окружения
+>>>>>>> e99714d2fd2434b8c191ebc10fecfef5620859fd
 
     def vk_user_info(self):
         """
