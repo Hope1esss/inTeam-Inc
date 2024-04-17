@@ -2,7 +2,7 @@ from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = "sqlite+aiosqlite:///database.db"
+DATABASE_URL = "sqlite+aiosqlite:///./app/api/db/database.db"
 
 
 class Base(DeclarativeBase):
