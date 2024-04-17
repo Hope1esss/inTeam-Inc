@@ -21,6 +21,8 @@ python-dotenv = "^1.0.1"
 requests = "^2.31.0"
 sqlalchemy = "^2.0.29"
 uvicorn = "^0.29.0"
+pydantic = "^2.7.0"
+pydantic-settings = "^2.2.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.0"

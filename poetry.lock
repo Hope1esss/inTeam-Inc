@@ -909,6 +909,25 @@ files = [
 typing-extensions = ">=4.6.0,<4.7.0 || >4.7.0"
 
 [[package]]
+name = "pydantic-settings"
+version = "2.2.1"
+description = "Settings management using Pydantic"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pydantic_settings-2.2.1-py3-none-any.whl", hash = "sha256:0235391d26db4d2190cb9b31051c4b46882d28a51533f97440867f012d4da091"},
+    {file = "pydantic_settings-2.2.1.tar.gz", hash = "sha256:00b9f6a5e95553590434c0fa01ead0b216c3e10bc54ae02e37f359948643c5ed"},
+]
+
+[package.dependencies]
+pydantic = ">=2.3.0"
+python-dotenv = ">=0.21.0"
+
+[package.extras]
+toml = ["tomli (>=2.0.1)"]
+yaml = ["pyyaml (>=6.0.1)"]
+
+[[package]]
 name = "pyflakes"
 version = "3.2.0"
 description = "passive checker of Python programs"
@@ -1204,4 +1223,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f2a1cd26a148747a586dad0a8ac3a78075edcc6a32623a85bd122bb23e9a2b5e"
+content-hash = "ac1ec6e0f0e0f9421f370118d22177c8ef79f4fa890f26f05acb6a3075403a34"
