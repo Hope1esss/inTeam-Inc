@@ -1,13 +1,18 @@
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserBase(BaseModel):
-    username: str
+    username: str = Field(..., min_length=3, max_length=50)
 
 
 class UserCreate(UserBase):
+    password: str = Field(..., min_length=4, max_length=50)
+
+
+class UserLogin(UserBase):
+    username: str
     password: str
 
 
@@ -19,4 +24,4 @@ class User(UserBase):
     updated_at: datetime.datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

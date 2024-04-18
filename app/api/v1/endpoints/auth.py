@@ -1,19 +1,28 @@
-# import uuid
-# from fastapi import APIRouter
-# from fastapi_users import FastAPIUsers
-# from app.api.crud.manager import get_user_manager
-# from app.api.db.base import auth_backend
-# from app.api.db.init_db import User
-# from app.api.schemas.user import UserRead, UserCreate
-#
-# router = APIRouter()
-#
-# fastapi_users = FastAPIUsers[User, uuid.UUID](
-#     get_user_manager,
-#     [auth_backend],
-# )
-#
-# register_router = fastapi_users.get_register_router(UserRead, UserCreate)
-# router.include_router(register_router, tags=["auth"])
-# login_router = fastapi_users.get_auth_router(auth_backend)
-# router.include_router(login_router, tags=["auth"])
+from fastapi import APIRouter, Depends, Response
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.db.session import get_session
+
+from app.api.schemas.user import UserCreate, UserLogin
+
+from app.api.services.user_service import create_user, login_user, create_access_token
+
+router = APIRouter()
+
+
+@router.post("/register")
+async def register(user: UserCreate, session: AsyncSession = Depends(get_session)):
+    new_user = await create_user(user_data=user, session=session)
+    return {"message": "User created successfully", "user_id": new_user.id}
+
+
+@router.post("/login")
+async def login(
+    response: Response, user: UserLogin, session: AsyncSession = Depends(get_session)
+):
+    user = await login_user(user_data=user, session=session)
+    response.set_cookie(key="user_id", value=str(user.id))
+    access_token = create_access_token(data={"sub": user.username})
+    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    return {"message": "Login successful"}
