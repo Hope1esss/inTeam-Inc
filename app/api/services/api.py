@@ -1,6 +1,5 @@
 """
-Этот модуль предназначен для взаимодействия с API ВКонтакте и работы с данными пользователей. 
-
+Этот модуль предназначен для взаимодействия с API ВКонтакте и работы с данными пользователей.
 Он предоставляет класс `Api`, который позволяет:
 
 *   Получать информацию о пользователе, такую как ID, пол, дата рождения, город и образование.
@@ -28,19 +27,12 @@ api.vk_posts_exporter()
 import os
 import csv
 import sqlite3
-import requests
+import asyncio
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-# def vk_parser():
-#     vk_get_main_info()
-#     vk_get_wall()
-=======
-=======
->>>>>>> e99714d2fd2434b8c191ebc10fecfef5620859fd
 
 class Api:
     """
@@ -74,24 +66,12 @@ class Api:
         user_id : str
             ID пользователя ВКонтакте.
         """
-
         self.user_id = user_id
-<<<<<<< HEAD
-<<<<<<< HEAD
-        self.token = os.getenv("TOKEN")
->>>>>>> f4f3e6e (update)
-=======
         self.token = os.getenv(
             "TOKEN"
         )  # Получает токен доступа из переменной окружения
->>>>>>> 902702d (add feature: new comments)
-=======
-        self.token = os.getenv(
-            "TOKEN"
-        )  # Получает токен доступа из переменной окружения
->>>>>>> e99714d2fd2434b8c191ebc10fecfef5620859fd
 
-    def vk_user_info(self):
+    async def vk_user_info(self):
         """
         Получает информацию о пользователе из API ВКонтакте и записывает ее в базу данных SQLite.
 
@@ -104,17 +84,20 @@ class Api:
             "sex,bdate,city,education"  # Запрашиваемые поля информации о пользователе
         )
 
-        response = requests.get(  # Отправляет запрос к API ВКонтакте
-            "https://api.vk.com/method/users.get",
-            params={
-                "access_token": self.token,
-                "v": version,
-                "user_ids": user_ids,
-                "fields": fields,
-                "lang": ru,
-            },
-            timeout=100,
-        )
+        async with httpx.AsyncClient() as client:
+            response = (
+                await client.get(  # Отправляет асинхронный запрос к API ВКонтакте
+                    "https://api.vk.com/method/users.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_ids": user_ids,
+                        "fields": fields,
+                        "lang": ru,
+                    },
+                    timeout=100,
+                )
+            )
 
         data = response.json()["response"][0]  # Извлекает данные из JSON-ответа
 
@@ -138,7 +121,7 @@ class Api:
             None if university_name_data == "" else university_name_data,
         )
 
-    def _vk_wall_posts(self):
+    async def _vk_wall_posts(self):
         """
         Получает список записей со стены пользователя ВКонтакте.
 
@@ -156,30 +139,34 @@ class Api:
         all_posts = []
         offset = 0  # Смещение для получения следующих записей
 
-        # Отправляет запрос к API ВКонтакте
-        response = requests.get(
-            "https://api.vk.com/method/wall.get",
-            params={
-                "access_token": self.token,
-                "v": version,
-                "owner_id": user_id,
-                "count": count_of_wall,
-                "filter": post_type,
-                "extended": additional_fields,
-                "fields": additional_fields_params,
-                "offset": offset,
-            },
-            timeout=100,
-        )
-        data = response.json()["response"]["items"]  # Извлекает данные из JSON-ответа
-        all_posts.extend(data)  # Добавляет полученные записи в список
+        async with httpx.AsyncClient() as client:
+            # Отправляет запрос к API ВКонтакте
+            response = await client.get(
+                "https://api.vk.com/method/wall.get",
+                params={
+                    "access_token": self.token,
+                    "v": version,
+                    "owner_id": user_id,
+                    "count": count_of_wall,
+                    "filter": post_type,
+                    "extended": additional_fields,
+                    "fields": additional_fields_params,
+                    "offset": offset,
+                },
+                timeout=100,
+            )
+            data = response.json()["response"][
+                "items"
+            ]  # Извлекает данные из JSON-ответа
+            all_posts.extend(data)  # Добавляет полученные записи в список
         return all_posts  # Возвращает список записей
 
     def vk_posts_exporter(self):
         """
         Экспортирует данные о записях пользователя ВКонтакте в CSV-файл "file1.csv".
 
-        Файл содержит информацию о количестве лайков, просмотров, тексте записи, URL-адресах изображений и аудиозаписей.
+        Файл содержит информацию о количестве лайков, просмотров, тексте записи, URL-адресах
+        изображений и аудиозаписей.
         """
         # os.remove("file1.csv")  # Удаляет существующий файл, если он есть
 
@@ -191,7 +178,7 @@ class Api:
             )  # Записывает заголовок
 
             # Перебирает записи на стене пользователя
-            for post in self.vk_wall_posts():
+            for post in self._vk_wall_posts():
                 img_url = []
                 audio_url = []
                 for i in range(len(post["attachments"])):
@@ -270,4 +257,7 @@ class Api:
             if database:
                 database.close()  # Закрывает соединение с базой данных
                 print("Соединение с SQLite закрыто")
-                
+
+
+api = Api("id264457326")
+asyncio.run(api.vk_user_info())
