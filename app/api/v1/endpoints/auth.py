@@ -22,7 +22,6 @@ async def login(
     response: Response, user: UserLogin, session: AsyncSession = Depends(get_session)
 ):
     user = await login_user(user_data=user, session=session)
-    response.set_cookie(key="user_id", value=str(user.id))
-    access_token = create_access_token(data={"sub": user.username})
-    response.set_cookie(key="access_token", value=access_token, httponly=True)
+    access_token = create_access_token(data={"sub": str(user.id)})
+    response.set_cookie(key="access_token", value=access_token)
     return {"message": "Login successful"}

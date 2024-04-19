@@ -48,7 +48,7 @@ ALGORITHM = settings.ALGORITHM
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=15)
+    expire = datetime.utcnow() + timedelta(minutes=30)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -59,16 +59,16 @@ async def get_current_user(
 ) -> User:
     token = request.cookies.get("access_token")
     if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="No token provided")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: int = payload.get("sub")
+        user_id: str = payload.get("sub")
         if user_id is None:
-            raise HTTPException(status_code=401, detail="Not authenticated")
-        result = await session.execute(select(User).filter(User.id == user_id))
+            raise HTTPException(status_code=401, detail="Invalid token payload")
+        result = await session.execute(select(User).filter(User.id == int(user_id)))
         user: User = result.scalars().first()
         if user is None:
             raise HTTPException(status_code=401, detail="User not found")
         return user
     except JWTError as exc:
-        raise HTTPException(status_code=401, detail="Not authenticated") from exc
+        raise HTTPException(status_code=401, detail="JWT fake") from exc

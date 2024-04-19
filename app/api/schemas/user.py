@@ -1,5 +1,4 @@
-import datetime
-
+from datetime import datetime
 from pydantic import BaseModel, Field
 
 
@@ -20,8 +19,8 @@ class User(UserBase):
     id: int
     is_active: bool
     is_superuser: bool
-    created_at: datetime.datetime
-    updated_at: datetime.datetime
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
