@@ -3,14 +3,13 @@ from jose import jwt, JWTError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
+from fastapi import HTTPException, Depends
 
 from app.api.core.config import settings
 from app.api.db.session import get_session
 from app.api.models.user import User
 from app.api.schemas.user import UserCreate, UserLogin
-from app.api.services.security import hash_password
-from fastapi import HTTPException, Depends
-from app.api.services.security import verify_password
+from app.api.services.security import hash_password, verify_password
 
 
 async def create_user(user_data: UserCreate, session: AsyncSession) -> User:
@@ -71,5 +70,5 @@ async def get_current_user(
         if user is None:
             raise HTTPException(status_code=401, detail="User not found")
         return user
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    except JWTError as exc:
+        raise HTTPException(status_code=401, detail="Not authenticated") from exc
