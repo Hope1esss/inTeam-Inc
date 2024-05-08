@@ -1,2 +1,2 @@
 # hi anyone!
-> project located in other branches
+> branch for frontend :)
