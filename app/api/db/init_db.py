@@ -1,21 +1,10 @@
-from fastapi_users.db import SQLAlchemyBaseUserTableUUID
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.asyncio import create_async_engine
+
 from app.api.core.config import settings
+from app.api.db.base import Base
+from app.api.models.user import User  # noqa # pylint: disable=unused-import
 
-DATABASE_URL = settings.database_url
-
-
-class Base(DeclarativeBase):
-    pass
-
-
-class User(SQLAlchemyBaseUserTableUUID, Base):
-    pass
-
-
-engine = create_async_engine(DATABASE_URL)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+engine = create_async_engine(settings.DATABASE_URL, echo=True)
 
 
 async def create_db_and_tables():

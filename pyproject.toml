@@ -14,17 +14,17 @@ version = "0.1.0"
 aiosqlite = "^0.20.0"
 bcrypt = "^4.1.2"
 fastapi = "^0.110.1"
-fastapi-users = { extras = ["sqlalchemy"], version = "^13.0.0" }
+fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
+passlib = "^1.7.4"
+pydantic = "^2.7.0"
+pydantic-settings = "^2.2.1"
 pylint = "^3.1.0"
 python = "^3.11"
 python-dotenv = "^1.0.1"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 requests = "^2.31.0"
-sqlalchemy = "^2.0.29"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.29"}
 uvicorn = "^0.29.0"
-pydantic = "^2.7.0"
-pydantic-settings = "^2.2.1"
-httpx = { version = "^0.27.0", extras = ["http2"] }
-
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.0"

@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 from .auth import router as auth_router
 from .dashboard import router as dashboard_router
 from .data import router as data_router
