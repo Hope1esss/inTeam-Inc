@@ -25,10 +25,16 @@ api.vk_posts_exporter()
 """
 
 import os
+import aiofiles
 import csv
 import sqlite3
 import asyncio
 import httpx
+import aiosqlite
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, Integer, String, select
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -72,191 +78,116 @@ class Api:
         )  # Получает токен доступа из переменной окружения
 
     async def vk_user_info(self):
-        """
-        Получает информацию о пользователе из API ВКонтакте и записывает ее в базу данных SQLite.
-
-        Информация включает в себя ID, пол, дату рождения, город и информацию об образовании.
-        """
         version = 5.89
-        user_ids = self.user_id
-        ru = 0  # Устанавливает язык ответа на русский
-        fields = (
-            "sex,bdate,city,education"  # Запрашиваемые поля информации о пользователе
-        )
-
-        async with httpx.AsyncClient() as client:
-            response = (
-                await client.get(  # Отправляет асинхронный запрос к API ВКонтакте
+        fields = "sex,bdate,city,education"
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
                     "https://api.vk.com/method/users.get",
                     params={
                         "access_token": self.token,
                         "v": version,
-                        "user_ids": user_ids,
+                        "user_ids": self.user_id,
                         "fields": fields,
-                        "lang": ru,
-                    },
-                    timeout=100,
+                        "lang": 0
+                    }
                 )
-            )
+            response.raise_for_status()  # Проверка на наличие HTTP ошибок
+            data = response.json()["response"][0]
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except httpx.RequestError as e:
+            print(f"Request error occurred: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+        else:
+            async with async_session() as session:
+                new_user = User(
+                    id=data["id"],
+                    sex=data["sex"],
+                    bdate=data.get("bdate"),
+                    city=data.get("city", {}).get("title"),
+                    education=data.get("university_name")
+                )
+                session.add(new_user)
+                await session.commit()
+                print("Пользователь сохранен в базу данных.")
 
-        data = response.json()["response"][0]  # Извлекает данные из JSON-ответа
-
-        # Извлекает необходимые данные из ответа
-        id_data = data["id"]
-        sex_data = data["sex"]
-        bdate_data = data.get(
-            "bdate", None
-        )  # Если дата рождения не указана, возвращает None
-        city_data = data.get("city", {}).get(
-            "title", None
-        )  # Если город не указан, возвращает None
-        university_name_data = data.get("university_name", None)
-
-        # Вызывает метод data_base_writer для записи данных в базу данных
-        self.data_base_writer(
-            id_data,
-            sex_data,
-            bdate_data,
-            None if city_data == "" else city_data,
-            None if university_name_data == "" else university_name_data,
-        )
-
-    async def _vk_wall_posts(self):
-        """
-        Получает список записей со стены пользователя ВКонтакте.
-
-        Returns
-        -------
-        list
-            Список словарей, содержащих информацию о каждой записи на стене.
-        """
+    async def vk_wall_posts(self):
         version = 5.137
-        user_id = self.user_id
-        count_of_wall = 100  # Количество запрашиваемых записей
-        post_type = "all"  # Тип записей (все)
-        additional_fields = 1  # Включает дополнительные поля profiles и groups в ответе
-        additional_fields_params = "id"  # Запрашиваемые дополнительные поля
-        all_posts = []
-        offset = 0  # Смещение для получения следующих записей
-
+        count_of_wall = 100
         async with httpx.AsyncClient() as client:
-            # Отправляет запрос к API ВКонтакте
             response = await client.get(
                 "https://api.vk.com/method/wall.get",
                 params={
                     "access_token": self.token,
                     "v": version,
-                    "owner_id": user_id,
+                    "owner_id": self.user_id,
                     "count": count_of_wall,
-                    "filter": post_type,
-                    "extended": additional_fields,
-                    "fields": additional_fields_params,
-                    "offset": offset,
-                },
-                timeout=100,
+                    "filter": "all",
+                    "extended": 1,
+                    "fields": "id",
+                    "offset": 0
+                }
             )
-            data = response.json()["response"][
-                "items"
-            ]  # Извлекает данные из JSON-ответа
-            all_posts.extend(data)  # Добавляет полученные записи в список
-        return all_posts  # Возвращает список записей
+        posts_data = response.json()["response"]["items"]
 
-    def vk_posts_exporter(self):
-        """
-        Экспортирует данные о записях пользователя ВКонтакте в CSV-файл "file1.csv".
-
-        Файл содержит информацию о количестве лайков, просмотров, тексте записи, URL-адресах
-        изображений и аудиозаписей.
-        """
-        # os.remove("file1.csv")  # Удаляет существующий файл, если он есть
-
-        # Открывает файл для записи
-        with open("file1.csv", "w", encoding="utf-8") as file:
-            pen = csv.writer(file)
-            pen.writerow(
-                ["likes", "views", "text", "img-url", "audio-url"]
-            )  # Записывает заголовок
-
-            # Перебирает записи на стене пользователя
-            for post in self._vk_wall_posts():
-                img_url = []
-                audio_url = []
-                for i in range(len(post["attachments"])):
-                    if post["attachments"][i]["type"] == "photo":
-                        img_url.append(
-                            post["attachments"][i]["photo"]["sizes"][-1]["url"]
-                        )
-                    if post["attachments"][i]["type"] == "audio":
-                        audio_url.append(post["attachments"][i]["audio"]["url"])
-                    if post["text"] == "":
-                        text = "None"
-                    else:
-                        text = post["text"]
-                pen.writerow(
-                    [
-                        post["likes"]["count"],
-                        post["views"]["count"] if "views" in post.keys() else "0",
-                        text,
-                        img_url,
-                        audio_url,
-                    ]
+        async with async_session() as session:
+            for post_data in posts_data:
+                new_post = Post(
+                    user_id=self.user_id,
+                    text=post_data["text"],
+                    likes=post_data["likes"]["count"],
+                    views=post_data.get("views", {}).get("count", 0),
+                    img_url=", ".join(
+                        [attachment["photo"]["sizes"][-1]["url"] for attachment in post_data.get("attachments", []) if
+                         attachment["type"] == "photo"]),
+                    audio_url=", ".join(
+                        [attachment["audio"]["url"] for attachment in post_data.get("attachments", []) if
+                         attachment["type"] == "audio"])
                 )
+                session.add(new_post)
+            await session.commit()
+            print("Записи сохранены в базу данных.")
 
-    def data_base_writer(self, user_id, sex, date_of_birth, city, education):
-        """
-        Записывает информацию о пользователе в базу данных SQLite "user.db".
+    async def vk_posts_exporter(self):
+        async with async_session() as session:
+            result = await session.execute(select(Post))
+            posts = result.scalars().all()
 
-        Parameters
-        ----------
-        user_id : int
-            ID пользователя.
-        sex : int
-            Пол пользователя (1 - женский, 2 - мужской).
-        date_of_birth : str
-            Дата рождения пользователя в формате DD.MM.YYYY.
-        city : str
-            Город пользователя.
-        education : str
-            Информация об образовании пользователя.
+        async with aiofiles.open("posts.csv", "w", newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['text', 'likes', 'views', 'img_url', 'audio_url'])
+            await csvfile.write(writer.writeheader())
+            for post in posts:
+                await csvfile.write(writer.writerow({
+                    'text': post.text,
+                    'likes': post.likes,
+                    'views': post.views,
+                    'img_url': post.img_url,
+                    'audio_url': post.audio_url
+                }))
+        print("Данные о записях экспортированы в CSV-файл.")
 
-        Raises
-        ------
-        sqlite3.Error
-            Если возникает ошибка при работе с базой данных.
-        """
+    async def async_db_setup():
+        """Асинхронное создание таблицы в базе данных, если она не существует."""
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+    async def data_base_writer(user_id, sex, date_of_birth, city, education):
         try:
-            database = sqlite3.connect("user.db")  # Подключается к базе данных
-            cursor = database.cursor()
-            print("Подключен к SQLite")
-
-            # Создает таблицу "users", если она не существует
-            cursor.execute(
-                """CREATE TABLE IF NOT EXISTS users (
-                id integer PRIMARY KEY,
-                sex integer,
-                bdate text,
-                city text,
-                education text
-            )"""
-            )
-
-            # Подготавливает запрос на вставку данных
-            sqlite_insert_with_param = """INSERT INTO users
-                                (id, sex, bdate, city, education)
-                                VALUES (?, ?, ?, ?, ?)"""
-            data_tuple = (user_id, sex, date_of_birth, city, education)
-
-            # Выполняет запрос на вставку данных
-            cursor.execute(sqlite_insert_with_param, data_tuple)
-            database.commit()  # Сохраняет изменения
-            print("Переменные Python успешно вставлены в таблицу user.db")
-            cursor.close()
-        except sqlite3.Error as error:
-            print("Ошибка при работе с SQLite", error)
-        finally:
-            if database:
-                database.close()  # Закрывает соединение с базой данных
-                print("Соединение с SQLite закрыто")
+            async with async_session() as session:
+                new_user = User(
+                    id=user_id,
+                    sex=sex,
+                    bdate=date_of_birth,
+                    city=city,
+                    education=education
+                )
+                session.add(new_user)
+                await session.commit()
+                print("Данные пользователя успешно сохранены.")
+        except Exception as e:
+            print(f"Database error occurred: {e}")
 
 
 api = Api("id264457326")
