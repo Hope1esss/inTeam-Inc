@@ -11,8 +11,9 @@ from app.api.services.user_service import create_user, login_user, create_access
 router = APIRouter()
 
 
-@router.post("/register")
+@router.post("/register", response_model=dict)
 async def register(user: UserCreate, session: AsyncSession = Depends(get_session)):
+    print(user.username, user.password)
     new_user = await create_user(user_data=user, session=session)
     return {"message": "User created successfully", "user_id": new_user.id}
 
