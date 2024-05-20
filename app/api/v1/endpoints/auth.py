@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.db.session import get_session
-from app.api.schemas.user import UserCreate, UserLogin
-from app.api.services.user_service import create_user, login_user, create_access_token
+from app.api.schemas.user import UserCreate, UserLogin, User
+from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user
 
 router = APIRouter()
 
@@ -24,3 +24,8 @@ async def login(
                         path="/",
                         samesite=None)
     return {'message': 'Login successful'}
+
+
+@router.get("/check-token", response_model=dict)
+async def check_token(current_user: User = Depends(get_current_user)):
+    return {"username": current_user.username}
