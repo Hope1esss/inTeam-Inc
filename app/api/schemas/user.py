@@ -21,6 +21,7 @@ class User(UserBase):
     is_superuser: bool
     created_at: datetime
     updated_at: datetime
+    vk_token: str = None
 
     class Config:
         from_attributes = True

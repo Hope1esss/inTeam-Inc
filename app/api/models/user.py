@@ -14,3 +14,5 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
+    vk_token = Column(String, nullable=True)
+    vk_user_id = Column(Integer, unique=True, nullable=True)

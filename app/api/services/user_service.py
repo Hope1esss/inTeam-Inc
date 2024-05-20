@@ -10,7 +10,7 @@ from app.api.db.session import get_session
 from app.api.models.user import User
 from app.api.schemas.user import UserCreate, UserLogin
 from app.api.services.security import hash_password, verify_password
-
+import requests
 
 async def create_user(user_data: UserCreate, session: AsyncSession) -> User:
     result = await session.execute(
@@ -72,3 +72,17 @@ async def get_current_user(
         return user
     except JWTError as exc:
         raise HTTPException(status_code=401, detail="JWT fake") from exc
+
+
+def get_vk_user_id(access_token: str) -> int:
+    # Функция для получения VK user ID через VK API
+    vk_api_url = "https://api.vk.com/method/users.get"
+    params = {
+        "access_token": access_token,
+        "v": "5.131"
+    }
+    response = requests.get(vk_api_url, params=params)
+    data = response.json()
+    if "response" in data:
+        return data["response"][0]["id"]
+    return None
