@@ -8,33 +8,38 @@
     <link rel="stylesheet" href="./assets/styles/style.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="header__naming">
-                <div class="header__logo"><img src="./assets/images/mobile-app-svgrepo-com.svg" alt="logo" class="logo"></div>
-                <div class="header__name">inTeam</div>
-            </div>
-            <div class="header__button">
-                <div class="header__button-signUp"><a href="sign.html" class="sign">Sign up</a></div>
-                <div class="header__button-login"><a href="login.html" class="login">Log in</a></div>
-            </div>
-        </header>
-        <main class="main">
-            <div class="main-text">Анализ страницы ВК</div>
-            <div class="main__form">
-                <form action="#" method="post">
-                    <label for="linkInput">
-                        <input type="text" id="linkInput" placeholder="Введите ссылку" class="linkInput"/>
-                        <button class="main_button" id="linkInput">start</button>
-                    </label>
-                </form>
-            </div>
-        </main>
-        <footer class="footer">
-            <div class="footer-about"><a href="#" class="about">About</a></div>
-            <div class="footer-git"><a href="#" class="git">GitHub</a></div>
-            <div class="footer-contact"><a href="#" class="contact">Contact us</a></div>
-        </footer>
-    </div>
+<div class="container">
+    <header class="header">
+        <div class="header__naming">
+            <div class="header__logo"><img src="./assets/images/mobile-app-svgrepo-com.svg" alt="logo" class="logo"></div>
+            <div class="header__name">inTeam</div>
+        </div>
+        <div class="header__user-info" id="user-info" style="display: none;">
+            <div class="header__avatar" id="user-avatar"></div>
+            <div class="header__username" id="user-name"></div>
+        </div>
+        <div class="header__buttons" id="auth-buttons">
+            <div class="header__button-signUp"><a href="sign.html" class="sign">Sign up</a></div>
+            <div class="header__button-login"><a href="login.html" class="login">Log in</a></div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="main-text">Анализ страницы ВК</div>
+        <div class="main__form">
+            <form action="#" method="post">
+                <label for="linkInput">
+                    <input type="text" id="linkInput" placeholder="Введите ссылку" class="linkInput"/>
+                    <button class="main_button" id="startButton">start</button>
+                </label>
+            </form>
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="footer-about"><a href="#" class="about">About</a></div>
+        <div class="footer-git"><a href="#" class="git">GitHub</a></div>
+        <div class="footer-contact"><a href="#" class="contact">Contact us</a></div>
+    </footer>
+</div>
+<script src="main.js"></script>
 </body>
 </html>

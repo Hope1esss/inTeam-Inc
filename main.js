@@ -1,12 +1,52 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
+
+    const userInfo = document.getElementById('user-info');
+    const userAvatar = document.getElementById('user-avatar');
+    const userName = document.getElementById('user-name');
+    const authButtons = document.getElementById('auth-buttons');
+
+
+    const cookies = document.cookie.split('; ').reduce((prev, current) => {
+        const [name, ...value] = current.split('=');
+        prev[name] = value.join('=');
+        return prev;
+    }, {});
+
+
+    if (cookies.access_token) {
+        try {
+            const response = await fetch('http://localhost:8000/api/v1/auth/check-token', {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch user info');
+            }
+
+            const data = await response.json();
+            userName.textContent = data.username;
+            userAvatar.textContent = data.username.slice(0, 2).toUpperCase();
+
+            userInfo.style.display = 'flex';
+            authButtons.style.display = 'none';
+        } catch (error) {
+            console.error('Error during token check:', error);
+            document.getElementById('message').textContent = error.message;
+        }
+    }
+
 
     if (registerForm) {
         registerForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+
+            // Проверка наличия токена при загрузке стран
 
             try {
                 const response = await fetch('http://localhost:8000/api/v1/auth/register', {
@@ -14,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username, password }),
+                    body: JSON.stringify({username, password}),
                     credentials: 'include'
                 });
 
@@ -38,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     if (loginForm) {
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -50,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ username, password }),
+                    body: JSON.stringify({username, password}),
                     credentials: 'include'
                 });
 

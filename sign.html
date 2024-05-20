@@ -26,6 +26,20 @@
         </form>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cookies = document.cookie.split('; ').reduce((prev, current) => {
+            const [name, ...value] = current.split('=');
+            prev[name] = value.join('=');
+            return prev;
+        }, {});
+
+        console.log(cookies.access_token)
+        if (cookies.access_token) {
+            window.location.href = 'index.html';
+        }
+    });
+</script>
 <script src="main.js"></script>
 </body>
 </html>
