@@ -23,7 +23,7 @@ async def login(
 ):
     user = await login_user(user_data=user, session=session)
     access_token = create_access_token(data={"sub": str(user.id)})
-    response.set_cookie(key="access_token",
+    response.set_cookie(key="jwt",
                         value=access_token,
                         path="/",
                         samesite=None)
@@ -76,3 +76,8 @@ async def auth_vk(data: dict, session: AsyncSession = Depends(get_session)):
     user = await create_or_update_user(db=session, vk_user_id=user_info["id"], username=username, access_token=access_token)
 
     return JSONResponse(content={"message": "User authenticated", "username": username})
+
+
+@router.get("/check-token", response_model=dict)
+async def check_token(current_user: User = Depends(get_current_user)):
+    return {"username": current_user.username, "user_id": current_user.id}
