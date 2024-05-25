@@ -3,27 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>login</title>
+    <title>Login</title>
     <link rel="stylesheet" href="./assets/styles/normalize.css">
     <link rel="stylesheet" href="./assets/styles/style.css">
 </head>
 <body>
-    <div class="container-form">
-        <div class="card-login">
-            <form>
-                <div class="card__logo">
-                    <div class="card__logo-img"><img src="./assets/images/mobile-app-svgrepo-com.svg" alt="logo" class="logo-img"></div>
-                    <div class="card__logo-name">inTeam</div>
-                </div>
-                <div class="card_vk"><button class="button-vk">Продолжить через ВК</button></div>
-                <div class="card__autorization">
-                    <div class="card__autorization_login"><input type="text" placeholder="Логин" class="input-login"></div>
-                    <div class="card__autorization_password"><input type="password" placeholder="Пароль" class="input-password"></div>
-                </div>
-                <div class="card__continue"><button class="button-continue">Продолжить</button></div>
-                <div class="card__text">Нет аккаунта? <a href="sign.html" class="card-link">Зарегистрируйтесь</a></div>
-            </form>
-        </div>
+<div class="container-form">
+    <div class="card-login">
+        <form id="loginForm">
+            <div class="card__logo">
+                <div class="card__logo-img"><img src="./assets/images/mobile-app-svgrepo-com.svg" alt="logo" class="logo-img"></div>
+                <div class="card__logo-name">inTeam</div>
+            </div>
+            <div class="card_vk"><button type="button" class="button-vk" id="vk-login-btn">Продолжить через ВК</button></div>
+            <div class="card__autorization">
+                <div class="card__autorization_login"><label for="username"></label><input type="text" placeholder="Логин" id="username" class="input-login" required></div>
+                <div class="card__autorization_password"><label for="password"></label><input type="password" placeholder="Пароль" id="password" class="input-password" required></div>
+            </div>
+            <div class="card__continue"><button type="submit" class="button-continue">Продолжить</button></div>
+            <div class="card__text">Нет аккаунта? <a href="sign.html" class="card-link">Зарегистрируйтесь</a></div>
+            <div id="message" style="color: red"></div>
+        </form>
     </div>
+</div>
+<script src="auth.js"></script>
+<script src="login.js"></script>
 </body>
 </html>
