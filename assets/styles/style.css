@@ -152,21 +152,6 @@ a {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.about:hover {
-  color: #606060;
-  font-size: 19px;
-}
-
-.git:hover {
-  color: #606060;
-  font-size: 19px;
-}
-
-.contact:hover {
-  color: #606060;
-  font-size: 19px;
-}
-
 .container-form{
   display: flex;
   width: 100vw;
@@ -288,4 +273,14 @@ a {
 
 ::placeholder {
   text-align: center;
+}
+
+.footer-link {
+  transition: 0.5s;
+}
+
+.footer-link:hover {
+  transition: 0.5s;
+  color: #606060;
+  font-size: 18px;
 }
