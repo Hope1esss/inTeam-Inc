@@ -1,6 +1,9 @@
+import CONFIG from 'config';
+
+
 function redirectToVKAuth() {
     const client_id = '51899044'; // Замените на ваш client_id
-    const redirect_uri = encodeURIComponent('https://4894-195-123-219-158.ngrok-free.app/callback.html'); // URL, на который будет передан code
+    const redirect_uri = encodeURIComponent(CONFIG.REDIRECT_URI); // URL, на который будет передан code
     const display = 'page'; // Отображение в отдельном окне
     const scope = 'friends'; // Права доступа, которые вы хотите запросить
     const response_type = 'code'; // Тип ответа - code
