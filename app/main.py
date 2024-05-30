@@ -11,11 +11,13 @@ app = FastAPI()
 app.include_router(api_v1_router, prefix="/api/v1")
 
 
-origins = ["http://localhost",
-           "http://localhost:8000",
-           "http://127.0.0.1:8000",
-           'http://localhost:5500',
-           "https://4894-195-123-219-158.ngrok-free.app"]
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:5500",
+    "https://0c4e-95-164-88-155.ngrok-free.app",
+]
 
 app.add_middleware(
     CORSMiddleware,

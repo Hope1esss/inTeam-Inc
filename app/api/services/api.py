@@ -13,17 +13,17 @@ DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 Base = declarative_base()
-async_session = sessionmaker(
-    bind=engine, expire_on_commit=False, class_=AsyncSession
-)
+async_session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
-class User(Base):
-    __tablename__ = "users"
+
+class Hint(Base):
+    __tablename__ = "hints"
     id = Column(Integer, primary_key=True, index=True)
     sex = Column(Integer)
     bdate = Column(String, nullable=True)
     city = Column(String, nullable=True)
     education = Column(String, nullable=True)
+
 
 class Post(Base):
     __tablename__ = "posts"
@@ -34,6 +34,7 @@ class Post(Base):
     views = Column(Integer)
     img_url = Column(String, nullable=True)
     audio_url = Column(String, nullable=True)
+
 
 class Api:
     def __init__(self, user_id):
@@ -52,8 +53,8 @@ class Api:
                         "v": version,
                         "user_ids": self.user_id,
                         "fields": fields,
-                        "lang": 0
-                    }
+                        "lang": 0,
+                    },
                 )
             response.raise_for_status()
             data = response.json()
@@ -70,18 +71,20 @@ class Api:
         else:
             async with async_session() as session:
                 async with session.begin():
-                    existing_user = await session.get(User, user_data["id"])
+                    existing_user = await session.get(Hint, user_data["id"])
                     if existing_user:
-                        print(f"Пользователь {self.user_id} уже существует в базе данных.")
+                        print(
+                            f"Пользователь {self.user_id} уже существует в базе данных."
+                        )
                     else:
-                        new_user = User(
+                        new_hint = Hint(
                             id=user_data["id"],
                             sex=user_data["sex"],
                             bdate=user_data.get("bdate"),
                             city=user_data.get("city", {}).get("title"),
-                            education=user_data.get("university_name")
+                            education=user_data.get("university_name"),
                         )
-                        session.add(new_user)
+                        session.add(new_hint)
                         await session.commit()
                         print(f"Пользователь {self.user_id} сохранен в базу данных.")
 
@@ -100,8 +103,8 @@ class Api:
                         "filter": "all",
                         "extended": 1,
                         "fields": "id",
-                        "offset": 0
-                    }
+                        "offset": 0,
+                    },
                 )
             response.raise_for_status()
             data = response.json()
@@ -125,11 +128,19 @@ class Api:
                             likes=post_data.get("likes", {}).get("count", 0),
                             views=post_data.get("views", {}).get("count", 0),
                             img_url=", ".join(
-                                [attachment["photo"]["sizes"][-1]["url"] for attachment in post_data.get("attachments", []) if
-                                 attachment["type"] == "photo"]),
+                                [
+                                    attachment["photo"]["sizes"][-1]["url"]
+                                    for attachment in post_data.get("attachments", [])
+                                    if attachment["type"] == "photo"
+                                ]
+                            ),
                             audio_url=", ".join(
-                                [attachment["audio"]["url"] for attachment in post_data.get("attachments", []) if
-                                 attachment["type"] == "audio"])
+                                [
+                                    attachment["audio"]["url"]
+                                    for attachment in post_data.get("attachments", [])
+                                    if attachment["type"] == "audio"
+                                ]
+                            ),
                         )
                         session.add(new_post)
             await session.commit()
@@ -139,6 +150,7 @@ class Api:
     async def async_db_setup():
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+
 
 async def main():
     user_id = "id264457326"  # Укажите ID пользователя
@@ -152,6 +164,7 @@ async def main():
     # await Api.async_db_setup()
     # await api.vk_user_info()
     # await api.vk_wall_posts()
+
 
 if __name__ == "__main__":
     asyncio.run(main())
