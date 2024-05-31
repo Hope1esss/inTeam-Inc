@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function redirectToVKAuth() {
-    const client_id = '51899044'; // Замените на ваш client_id
+    const client_id = CONFIG.CLIENT_ID; // Замените на ваш client_id
     const redirect_uri = encodeURIComponent(CONFIG.REDIRECT_URI); // URL, на который будет передан code
     const display = 'page'; // Отображение в отдельном окне
     const scope = 'friends'; // Права доступа, которые вы хотите запросить
