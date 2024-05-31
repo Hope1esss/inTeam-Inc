@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, Response, HTTPException
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, Response, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.api.services.security import hash_password
 from app.api.crud.operations import create_or_update_user
 from app.api.db.session import get_session
 from app.api.schemas.token import Token
-from app.api.schemas.user import UserCreate, UserLogin, User
-from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user, get_vk_user_id
+from app.api.schemas.user import UserCreate, UserLogin, User, RegisterVk
+import app.api.models.user as user_m
+from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user, get_vk_user_info
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import requests
@@ -29,3 +34,27 @@ async def login(
                         samesite=None)
     return {'message': 'Login successful'}
 
+
+@router.post("/register_vk")
+async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_session)):
+    result = await db.execute(select(user_m.User).filter(user_m.User.vk_id == request.vk_id))
+    user = result.scalars().first()
+
+    if user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already registered")
+
+    vk_user_info = await get_vk_user_info(request.access_token)
+    username = f"{vk_user_info['first_name']} {vk_user_info['last_name']}"
+
+    new_user = user_m.User(
+        vk_id=request.vk_id,
+        vk_token=request.access_token,
+        username=username,
+        hashed_password=hash_password(request.password),
+        expires_in=request.expires_in,
+    )
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+
+    return {"message": "User registered successfully", "user_id": new_user.id}

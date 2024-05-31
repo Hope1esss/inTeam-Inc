@@ -5,7 +5,7 @@ from app.api.crud.operations import create_or_update_user
 from app.api.db.session import get_session
 from app.api.schemas.token import Token, CodeRequest
 from app.api.schemas.user import UserCreate, UserLogin, User
-from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user, get_vk_user_id
+from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from app.api.core.config import settings

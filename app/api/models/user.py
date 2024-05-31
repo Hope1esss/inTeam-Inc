@@ -15,4 +15,5 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
     vk_token = Column(String, nullable=True)
-    vk_user_id = Column(Integer, unique=True, nullable=True)
+    vk_id = Column(Integer, unique=True, nullable=True)
+    expires_in = Column(Integer)
