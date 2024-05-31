@@ -27,8 +27,11 @@ class User(UserBase):
         from_attributes = True
 
 
-class RegisterVk(BaseModel):
+class LoginVk(BaseModel):
     access_token: str
     vk_id: int
-    password: str
     expires_in: int
+
+
+class RegisterVk(LoginVk):
+    password: str

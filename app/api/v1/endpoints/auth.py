@@ -7,7 +7,7 @@ from app.api.services.security import hash_password
 from app.api.crud.operations import create_or_update_user
 from app.api.db.session import get_session
 from app.api.schemas.token import Token
-from app.api.schemas.user import UserCreate, UserLogin, User, RegisterVk
+from app.api.schemas.user import UserCreate, UserLogin, User, RegisterVk, LoginVk
 import app.api.models.user as user_m
 from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user, get_vk_user_info
 from fastapi import Request
@@ -45,7 +45,7 @@ async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_sess
 
     vk_user_info = await get_vk_user_info(request.access_token)
     username = f"{vk_user_info['first_name']} {vk_user_info['last_name']}"
-
+    avatar_url = vk_user_info.get('photo_200', '')
     new_user = user_m.User(
         vk_id=request.vk_id,
         vk_token=request.access_token,
@@ -57,4 +57,40 @@ async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_sess
     await db.commit()
     await db.refresh(new_user)
 
-    return {"message": "User registered successfully", "user_id": new_user.id}
+    return {
+        "message": "User registered successfully",
+        "user_id": new_user.id,
+        "username": username,
+        "avatar_url": avatar_url,
+        "expires_in": request.expires_in
+    }
+
+
+
+@router.post("/login_vk")
+async def login_user(request: LoginVk, db: AsyncSession = Depends(get_session)):
+    async with db.begin():
+        result = await db.execute(select(user_m.User).filter(user_m.User.vk_id == request.vk_id))
+        user = result.scalars().first()
+
+        if not user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not registered")
+
+    # Получаем информацию о пользователе из VK вне транзакции
+    vk_user_info = await get_vk_user_info(request.access_token)
+    username = f"{vk_user_info['first_name']} {vk_user_info['last_name']}"
+    avatar_url = vk_user_info.get('photo_200', '')
+    print(vk_user_info)
+    user.vk_token = request.access_token
+    user.expires_in = request.expires_in
+    user.updated_at = datetime.utcnow()
+    await db.commit()
+    await db.refresh(user)
+
+    return {
+        "message": "User logged in successfully",
+        "user_id": user.id,
+        "username": username,
+        "avatar_url": avatar_url,
+        "expires_in": request.expires_in
+    }
