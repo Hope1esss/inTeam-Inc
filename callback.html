@@ -18,7 +18,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ code })
+                    body: JSON.stringify({ code: code })
                 });
 
                 if (!response.ok) {
@@ -27,8 +27,14 @@
 
                 const data = await response.json();
                 console.log('Access Token:', data.access_token);
-                // Сохранение токена в localStorage или выполнение других действий
-                localStorage.setItem('access_token', data.access_token);
+
+                // Сохранение токена во временную переменную
+                window.accessToken = data.access_token;
+                window.vkId = data.user_id;
+                window.expires_in = data.expires_in;
+
+                // Показ формы для ввода пароля
+                document.getElementById('register-form').style.display = 'block';
             } catch (error) {
                 console.error('Error during access token retrieval:', error);
             }
@@ -38,6 +44,42 @@
     }
 
     getAccessToken();
+</script>
+
+<!-- Форма для ввода пароля -->
+<form id="register-form" style="display:none;" onsubmit="registerUser(event)">
+    <input type="password" id="password" placeholder="Enter your password" required>
+    <button type="submit">Register</button>
+</form>
+
+<script>
+    async function registerUser(event) {
+        event.preventDefault();
+
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('http://localhost:8000/api/v1/auth/register_vk', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                access_token: window.accessToken,
+                vk_id: window.vkId,
+                password: password,
+                expires_in: window.expires_in
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+            // Перенаправление или другие действия после успешной регистрации
+        } else {
+            const errorData = await response.json();
+            alert('Error: ' + errorData.detail);
+        }
+    }
 </script>
 </body>
 </html>
