@@ -6,7 +6,38 @@
     <title>Callback</title>
 </head>
 <body>
-<div id="message" style="color: red"></div>
-<script src="callback.js"></script>
+<script>
+    async function getAccessToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/token/get_access_token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch access token');
+                }
+
+                const data = await response.json();
+                console.log('Access Token:', data.access_token);
+                // Сохранение токена в localStorage или выполнение других действий
+                localStorage.setItem('access_token', data.access_token);
+            } catch (error) {
+                console.error('Error during access token retrieval:', error);
+            }
+        } else {
+            console.error('Code not found in URL');
+        }
+    }
+
+    getAccessToken();
+</script>
 </body>
 </html>
