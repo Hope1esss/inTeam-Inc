@@ -8,32 +8,65 @@
     <link rel="stylesheet" href="./assets/styles/style.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="header__naming">
-                <div class="header__logo"><img src="./assets/images/lologo.svg" alt="lologo" class="logo"></div>
+<div class="container">
+    <header class="header">
+        <div class="header__naming">
+            <div class="header__logo"><img src="./assets/images/lologo.svg" alt="lologo" class="logo"></div>
+        </div>
+        <div class="header__button">
+            <div id="user-info" class="header__user-info">
+                <!-- Здесь будут отображаться аватарка и инициалы пользователя -->
             </div>
-            <div class="header__button">
-                <div class="header__button-signUp"><a href="sign.html" class="sign">Sign up</a></div>
-                <div class="header__button-login"><a href="login.html" class="login">Log in</a></div>
-            </div>
-        </header>
-        <main class="main">
-            <div class="main-text">Анализ страницы ВК</div>
-            <div class="main__form">
-                <form action="#" method="post">
-                    <label for="linkInput">
-                        <input type="text" id="linkInput" placeholder="Введите ссылку" class="linkInput"/>
-                        <button class="main_button" id="linkInput">start</button>
-                    </label>
-                </form>
-            </div>
-        </main>
-        <footer class="footer">
-            <div class="footer-about footer-link-container"><a href="#" class="about footer-link">About</a></div>
-            <div class="footer-git footer-link-container"><a href="#" class="git footer-link">GitHub</a></div>
-            <div class="footer-contact footer-link-container"><a href="#" class="contact footer-link">Contact us</a></div>
-        </footer>
-    </div>
+            <div class="header__button-signUp" id="sign-up-button"><a href="sign.html" class="sign">Sign up</a></div>
+            <div class="header__button-login" id="log-in-button"><a href="login.html" class="login">Log in</a></div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="main-text">Анализ страницы ВК</div>
+        <div class="main__form">
+            <form action="#" method="post">
+                <label for="linkInput">
+                    <input type="text" id="linkInput" placeholder="Введите ссылку" class="linkInput"/>
+                    <button class="main_button" id="linkInput">start</button>
+                </label>
+            </form>
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="footer-about footer-link-container"><a href="#" class="about footer-link">About</a></div>
+        <div class="footer-git footer-link-container"><a href="#" class="git footer-link">GitHub</a></div>
+        <div class="footer-contact footer-link-container"><a href="#" class="contact footer-link">Contact us</a></div>
+    </footer>
+</div>
+
+<script>
+    // Проверка и отображение данных пользователя
+    document.addEventListener('DOMContentLoaded', function () {
+        const username = localStorage.getItem('username');
+        const avatarUrl = localStorage.getItem('avatar_url');
+        const tokenExpiry = localStorage.getItem('token_expiry');
+
+        // Проверка срока действия токена
+        if (tokenExpiry && new Date().getTime() > parseInt(tokenExpiry)) {
+            // Токен истек, очищаем данные пользователя и перенаправляем на страницу входа
+            localStorage.removeItem('username');
+            localStorage.removeItem('avatar_url');
+            localStorage.removeItem('token_expiry');
+            alert('Your session has expired. Please log in again.');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        if (username && avatarUrl) {
+            const userInfoDiv = document.getElementById('user-info');
+            userInfoDiv.innerHTML = `
+                    <img src="${avatarUrl}" alt="User Avatar" class="user-avatar">
+                    <span class="user-name">${username}</span>
+                `;
+            document.getElementById('sign-up-button').style.display = 'none';
+            document.getElementById('log-in-button').style.display = 'none';
+        }
+    });
+</script>
 </body>
 </html>

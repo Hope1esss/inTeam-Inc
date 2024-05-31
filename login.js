@@ -1,6 +1,5 @@
 import CONFIG from "./config.js";
 
-
 document.addEventListener('DOMContentLoaded', async () => {
     const vkLoginButton = document.getElementById('vk-login-btn');
     vkLoginButton.addEventListener('click', redirectToVKAuth);

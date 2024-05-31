@@ -33,8 +33,13 @@
                 window.vkId = data.user_id;
                 window.expires_in = data.expires_in;
 
-                // Показ формы для ввода пароля
-                document.getElementById('register-form').style.display = 'block';
+                // Показ формы для ввода пароля (только для регистрации)
+                if (window.location.pathname.includes('register')) {
+                    document.getElementById('register-form').style.display = 'block';
+                } else {
+                    // Вход
+                    loginUser();
+                }
             } catch (error) {
                 console.error('Error during access token retrieval:', error);
             }
@@ -46,7 +51,7 @@
     getAccessToken();
 </script>
 
-<!-- Форма для ввода пароля -->
+<!-- Форма для ввода пароля (только для регистрации) -->
 <form id="register-form" style="display:none;" onsubmit="registerUser(event)">
     <input type="password" id="password" placeholder="Enter your password" required>
     <button type="submit">Register</button>
@@ -74,7 +79,46 @@
         if (response.ok) {
             const data = await response.json();
             alert(data.message);
-            // Перенаправление или другие действия после успешной регистрации
+
+            // Сохранение данных пользователя в localStorage
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('avatar_url', data.avatar_url);
+            const tokenExpiryTime = new Date().getTime() + (data.expires_in * 1000);
+            localStorage.setItem('token_expiry', tokenExpiryTime.toString());
+
+            // Перенаправление на index.html
+            window.location.href = 'index.html';
+        } else {
+            const errorData = await response.json();
+            alert('Error: ' + errorData.detail);
+        }
+    }
+
+    async function loginUser() {
+        const response = await fetch('http://localhost:8000/api/v1/auth/login_vk', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                access_token: window.accessToken,
+                vk_id: window.vkId,
+                expires_in: window.expires_in
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+
+            // Сохранение данных пользователя в localStorage
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('avatar_url', data.avatar_url);
+            const tokenExpiryTime = new Date().getTime() + (data.expires_in * 1000);
+            localStorage.setItem('token_expiry', tokenExpiryTime.toString());
+
+            // Перенаправление на index.html
+            window.location.href = 'index.html';
         } else {
             const errorData = await response.json();
             alert('Error: ' + errorData.detail);

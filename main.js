@@ -5,7 +5,7 @@ async function checkToken() {
         return prev;
     }, {});
 
-    if (cookies.access_token) {
+    if (cookies.jwt) {
         try {
             const response = await fetch('http://localhost:8000/api/v1/auth/check-token', {
                 method: 'GET',
