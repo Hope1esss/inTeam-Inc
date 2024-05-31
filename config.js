@@ -1,5 +1,5 @@
 const CONFIG = {
-    REDIRECT_URI: 'https://3b9e-95-164-88-155.ngrok-free.app/callback.html'
+    REDIRECT_URI: 'https://f4ec-194-54-176-114.ngrok-free.app/callback.html'
 };
 
 export default CONFIG;
