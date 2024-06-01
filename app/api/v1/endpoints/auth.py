@@ -56,7 +56,8 @@ async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_sess
             "user_id": user.id,
             "username": username,
             "avatar_url": avatar_url,
-            "expires_in": request.expires_in
+            "expires_in": request.expires_in,
+            "access_token": request.access_token
         }
 
     vk_user_info = await get_vk_user_info(request.access_token)
@@ -78,7 +79,8 @@ async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_sess
         "user_id": new_user.id,
         "username": username,
         "avatar_url": avatar_url,
-        "expires_in": request.expires_in
+        "expires_in": request.expires_in,
+        "access_token": request.access_token
     }
 
 

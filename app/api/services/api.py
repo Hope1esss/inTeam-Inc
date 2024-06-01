@@ -37,9 +37,9 @@ class Post(Base):
 
 
 class Api:
-    def __init__(self, user_id):
+    def __init__(self, user_id, token):
         self.user_id = user_id
-        self.token = os.getenv("TOKEN")
+        self.token = token
 
     async def vk_user_info(self):
         version = 5.89
@@ -58,6 +58,7 @@ class Api:
                 )
             response.raise_for_status()
             data = response.json()
+
             print("Full response:", data)
             user_data = data.get("response", [None])[0]
             if user_data is None:
@@ -87,6 +88,7 @@ class Api:
                         session.add(new_hint)
                         await session.commit()
                         print(f"Пользователь {self.user_id} сохранен в базу данных.")
+            return user_data
 
     async def vk_wall_posts(self):
         version = 5.137
