@@ -25,3 +25,13 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
+
+
+class LoginVk(BaseModel):
+    access_token: str
+    vk_id: int
+    expires_in: int
+
+
+class RegisterVk(LoginVk):
+    password: str

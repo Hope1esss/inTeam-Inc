@@ -1,7 +1,10 @@
 from datetime import timedelta, datetime
+
+import httpx
 from jose import jwt, JWTError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 from starlette.requests import Request
 from fastapi import HTTPException, Depends
 
@@ -74,15 +77,18 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="JWT fake") from exc
 
 
-def get_vk_user_id(access_token: str) -> int:
-    # Функция для получения VK user ID через VK API
-    vk_api_url = "https://api.vk.com/method/users.get"
+async def get_vk_user_info(access_token: str):
+    url = "https://api.vk.com/method/users.get"
     params = {
         "access_token": access_token,
-        "v": "5.131"
+        "v": "5.131",
+        'fields': 'photo_200'
     }
-    response = requests.get(vk_api_url, params=params)
-    data = response.json()
-    if "response" in data:
-        return data["response"][0]["id"]
-    return None
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+        response_data = response.json()
+        if "error" in response_data:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error retrieving user info from VK")
+        return response_data["response"][0]
+
+

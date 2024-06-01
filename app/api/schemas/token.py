@@ -6,3 +6,7 @@ class Token(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class CodeRequest(BaseModel):
+    code: str
