@@ -285,3 +285,26 @@ a {
   75% { background-color: #ffff00; }
   100% { background-color: #ff00ff; }
 }
+
+#password {
+  width: 50vw;
+  height: 40px;
+  border: 1px white solid;
+  font-size: 26px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.container-callback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(30deg, #8f28b174, #400cf960);
+}
+
+.logo-centr {
+  width: 300px;
+  height: 300px;
+  margin-top: 20vh;
+}

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Callback</title>
+    <link rel="stylesheet" href="./assets/styles/normalize.css">
+    <link rel="stylesheet" href="./assets/styles/style.css">
 </head>
 <body>
 <script>
@@ -50,11 +52,14 @@
     getAccessToken();
 </script>
 
+<div class="container-callback">
+    <img src="./assets/images/lologo.svg" alt="logo" class="logo-centr">
 <!-- Форма для ввода пароля (только для регистрации) -->
-<form id="register-form" style="display:none;" onsubmit="registerUser(event)">
-    <input type="password" id="password" placeholder="Enter your password" required>
-    <button type="submit">submit</button>
-</form>
+    <form id="register-form" onsubmit="registerUser(event)">
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button type="submit" class="header__button-signUp">submit</button>
+    </form>
+</div>
 
 <script>
     async function registerUser(event) {
