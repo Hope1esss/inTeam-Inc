@@ -27,7 +27,7 @@
             <form action="#" method="post">
                 <label for="linkInput">
                     <input type="text" id="linkInput" placeholder="Введите ссылку" class="linkInput"/>
-                    <button class="main_button" id="linkInput">start</button>
+                    <button type="button" class="main_button" id="startButton">start</button>
                 </label>
             </form>
         </div>
@@ -66,6 +66,37 @@
             document.getElementById('sign-up-button').style.display = 'none';
             document.getElementById('log-in-button').style.display = 'none';
         }
+
+
+        document.getElementById('startButton').addEventListener('click', async function () {
+            const userId = document.getElementById('linkInput').value;
+            const accessToken = localStorage.getItem('vk_token');
+            if (!userId || !accessToken) {
+                alert('User ID and access token are required');
+                //todo: перекинуть на форму с регистрацией через вк
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const result = await response.json();
+                console.log(result)
+                if (response.ok) {
+                    localStorage.setItem('vk_user_data', JSON.stringify(result));
+                    window.location.href = 'user_info.html';
+                } else {
+                    throw new Error(result.detail || 'Unknown error');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
     });
 </script>
 </body>

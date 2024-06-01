@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <link rel="stylesheet" href="./assets/styles/normalize.css">
+    <link rel="stylesheet" href="./assets/styles/style.css">
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <div class="header__naming">
+            <div class="header__logo"><img src="./assets/images/lologo.svg" alt="lologo" class="logo"></div>
+        </div>
+    </header>
+    <main class="main">
+        <div class="main-text">Информация о пользователе ВК</div>
+        <div id="user-info" class="user-info">
+            <!-- Здесь будет отображена информация о пользователе -->
+        </div>
+    </main>
+    <footer class="footer">
+        <div class="footer-about footer-link-container"><a href="#" class="about footer-link">About</a></div>
+        <div class="footer-git footer-link-container"><a href="#" class="git footer-link">GitHub</a></div>
+        <div class="footer-contact footer-link-container"><a href="#" class="contact footer-link">Contact us</a></div>
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const userInfo = JSON.parse(localStorage.getItem('vk_user_data'));
+        const userInfoDiv = document.getElementById('user-info');
+
+        if (userInfo) {
+            userInfoDiv.innerHTML = `
+                <pre>${JSON.stringify(userInfo, null, 2)}</pre>
+            `;
+        } else {
+            userInfoDiv.innerHTML = '<p>Информация о пользователе не найдена.</p>';
+        }
+    });
+</script>
+</body>
+</html>
