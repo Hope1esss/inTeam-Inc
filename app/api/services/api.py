@@ -120,7 +120,7 @@ class Api:
                 db.add(new_post)
             await db.commit()
             print(f"Записи пользователя {self.user_id} сохранены в базу данных.")
-
+        return posts_data
 
 
 # async def main():
