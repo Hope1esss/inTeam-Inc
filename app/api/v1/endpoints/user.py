@@ -22,22 +22,20 @@ async def get_user_id(user: UserCreate, db: AsyncSession = Depends(get_session))
 
 
 @router.post("/user_info/{user_id}", response_model=dict)
-async def get_user_info(user_id: str, access_token: str):
+async def get_user_info(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
     api = Api(user_id, access_token)
-    await Api.async_db_setup()
     try:
-        data = await api.vk_user_info()
+        data = await api.vk_user_info(db)
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/wall_posts/{user_id}", response_model=dict)
-async def get_wall_posts(user_id: str):
-    api = Api(user_id)
-    await Api.async_db_setup()
+@router.post("/wall_posts/{user_id}")
+async def get_wall_posts(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+    api = Api(user_id, access_token)
     try:
-        await api.vk_wall_posts()
-        return {"status": "Wall posts processed"}
+        data = await api.vk_wall_posts(db)
+        return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

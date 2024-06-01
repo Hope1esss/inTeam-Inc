@@ -31,6 +31,7 @@ pytest = "^8.2.1"
 pytest-asyncio = "^0.23.7"
 aioresponses = "^0.7.6"
 pytest-mock = "^3.14.0"
+urllib3 = "1.26.16"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.0"
