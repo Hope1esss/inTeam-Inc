@@ -303,8 +303,18 @@ a {
   background: linear-gradient(30deg, #8f28b174, #400cf960);
 }
 
-.logo-centr {
+.logo-center {
   width: 300px;
   height: 300px;
   margin-top: 20vh;
+}
+
+.header__user-info {
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
 }
