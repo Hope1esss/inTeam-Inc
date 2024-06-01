@@ -84,6 +84,7 @@
             localStorage.setItem('avatar_url', data.avatar_url);
             const tokenExpiryTime = new Date().getTime() + (data.expires_in * 1000);
             localStorage.setItem('token_expiry', tokenExpiryTime.toString());
+            localStorage.setItem('vk_token', data.access_token);
 
             // Перенаправление на index.html
             window.location.href = 'index.html';

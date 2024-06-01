@@ -1,5 +1,5 @@
 const CONFIG = {
-    REDIRECT_URI: 'https://255c-194-54-176-93.ngrok-free.app/callback.html',
+    REDIRECT_URI: 'https://bccf-194-54-176-74.ngrok-free.app/callback.html',
     CLIENT_ID: '51937099',
 
 };
