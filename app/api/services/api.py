@@ -11,10 +11,6 @@ from app.api.db.session import get_session
 from app.api.models.vk_api import Post, Hint
 from app.api.core.config import settings
 
-DATABASE_URL = settings.DATABASE_URL
-engine = create_async_engine(DATABASE_URL, echo=True)
-Base = declarative_base()
-async_session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
 from app.api.models.vk_api import Post, Hint, GiftInfo, GiftCount
 

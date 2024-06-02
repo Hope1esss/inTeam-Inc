@@ -1,16 +1,22 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse
-from starlette.staticfiles import StaticFiles
 from app.api.core.config import settings
-
 from app.api.db.init_db import create_db_and_tables
 from app.api.v1.endpoints import router as api_v1_router
 
+app = FastAPI(
+    title="My Project",
+    description="This is a sample project",
+    version="1.0.0",
+    docs_url="/api/v1/docs",  # Swagger UI
+    redoc_url="/api/v1/redoc",  # ReDoc UI
+    openapi_url="/api/v1/openapi.json"  # OpenAPI schema
+)
 
-app = FastAPI()
+# Подключение маршрутизатора с префиксом /api/v1
 app.include_router(api_v1_router, prefix="/api/v1")
 
+# Настройка CORS
 origins = [
     "http://localhost",
     "http://localhost:8000",
@@ -26,7 +32,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.on_event("startup")
 async def startup_event():
