@@ -16,6 +16,12 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 Base = declarative_base()
 async_session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
+GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
+GIGACHAT_PROMPT = (
+    "Я предоставлю тебе данные человека, напиши что ты думаешь о его интересах: "
+    "{full_name}, {sex}, {bdate}, {city}, {education}, {faculty}"
+)
+
 
 class Api:
     def __init__(self, user_id, token):
@@ -51,8 +57,10 @@ class Api:
         except Exception as e:
             print(f"Unexpected error: {e}")
         else:
-            # Обработка данных
             processed_data = {
+                "full_name": user_data.get("first_name", "")
+                + " "
+                + user_data.get("last_name", ""),
                 "sex": (
                     "Мужской"
                     if user_data.get("sex") == 2
@@ -71,7 +79,7 @@ class Api:
             else:
                 new_hint = Hint(
                     id=user_data["id"],
-                    full_name=user_data["first_name"] + " " + user_data["last_name"],
+                    full_name=processed_data["full_name"],
                     sex=processed_data["sex"],
                     bdate=processed_data["bdate"],
                     city=processed_data["city"],
@@ -140,6 +148,53 @@ class Api:
             print(f"Записи пользователя {self.user_id} сохранены в базу данных.")
         return posts_data
 
+    async def analyze_with_gigachat(self, db: AsyncSession, user_id: int):
+        async with db.begin():
+            result = await db.execute(select(Hint).where(Hint.id == user_id))
+            hint = result.scalars().first()
+            if not hint:
+                raise ValueError("User not found in the database")
+            
+            prompt = GIGACHAT_PROMPT.format(
+                full_name=hint.full_name,
+                sex=hint.sex,
+                bdate=hint.bdate,
+                city=hint.city,
+                education=hint.education,
+                faculty=hint.faculty
+            )
+
+            payload = {
+                "model": "GigaChat",
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                "temperature": 1,
+                "top_p": 0.1,
+                "n": 1,
+                "stream": False,
+                "max_tokens": 512,
+                "repetition_penalty": 1
+            }
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    GIGACHAT_API_URL,
+                    json=payload,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": f"Bearer {settings.GIGACHAT_API_KEY}"
+                    }
+                )
+                response.raise_for_status()
+                gigachat_data = response.json()
+                print("Gigachat response:", gigachat_data)
+                return gigachat_data["choices"][0]["message"]["content"]
+
 
 # async def main():
 #     user_id = "id264457326"  # Укажите ID пользователя
@@ -150,7 +205,7 @@ class Api:
 #     async with async_session() as session:
 #         await api.vk_user_info(session)
 #         await api.vk_wall_posts(session)
-#         await api.get_gigachat_data()  # Вызов функции для получения данных из Gigachat
+#         await api.analyze_with_gigachat(session, user_id)  # Вызов функции для получения данных из Gigachat
 
 
 # if __name__ == "__main__":
