@@ -21,6 +21,7 @@ GIGACHAT_PROMPT = (
     "Я предоставлю тебе данные человека, напиши что ты думаешь о его интересах: "
     "{full_name}, {sex}, {bdate}, {city}, {education}, {faculty}"
 )
+from app.api.models.vk_api import Post, Hint, GiftInfo, GiftCount
 
 
 class Api:
@@ -90,6 +91,206 @@ class Api:
                 await db.commit()
                 print(f"Пользователь {self.user_id} сохранен в базу данных.")
             return data
+
+    async def vk_gifts_info(self, db: AsyncSession):
+        version = 5.89
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.vk.com/method/gifts.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_id": self.user_id,
+                        "count": 1_0
+                    },
+                )
+            response.raise_for_status()
+            data = response.json()
+
+            print("Full response:", data)
+            if 'error' in data:
+                raise ValueError(f"API error: {data['error']['error_msg']}")
+
+            gifts_data = data.get("response", {}).get("items", [])
+            if not gifts_data:
+                raise ValueError("Key 'items' not found in the response or no gifts available")
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except httpx.RequestError as e:
+            print(f"Request error occurred: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+        else:
+            print("check")
+            for gift in gifts_data:
+                existing_gift = await db.get(GiftInfo, gift["id"])
+                if existing_gift:
+                    print(
+                        f"Подарок {gift['id']} уже существует в базе данных."
+                    )
+                else:
+                    new_gift = GiftInfo(
+                        id=gift["id"],
+                        from_id=gift.get("from_id"),
+                        message=gift.get("message"),
+                        date=gift.get("date"),
+                        gift_id=gift.get("gift", {}).get("id"),
+                        thumb_256=gift.get("gift", {}).get("thumb_256"),
+                        thumb_96=gift.get("gift", {}).get("thumb_96"),
+                        thumb_48=gift.get("gift", {}).get("thumb_48"),
+                    )
+                    db.add(new_gift)
+                    await db.commit()
+                    print(f"Подарок {gift['id']} сохранен в базу данных.")
+            return gifts_data
+
+    async def vk_gifts_count(self, db: AsyncSession):
+        version = 5.89
+        gift_count = 0
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.vk.com/method/gifts.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_id": self.user_id,
+                        "count": 20_000 # wHy limit 19_175??
+                    },
+                )
+            response.raise_for_status()
+            data = response.json()
+
+            print("Full response:", data)
+            if 'error' in data:
+                raise ValueError(f"API error: {data['error']['error_msg']}")
+
+            gifts_data = data.get("response", {}).get("items", [])
+            gift_count = len(gifts_data)
+
+            existing_gift_count = await db.get(GiftCount, self.user_id)
+            if existing_gift_count:
+                existing_gift_count.count = gift_count
+            else:
+                new_gift_count = GiftCount(user_id=self.user_id, count=gift_count)
+                db.add(new_gift_count)
+
+            await db.commit()
+            print(f"Количество подарков для пользователя {self.user_id} сохранено в базу данных: {gift_count}")
+
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except httpx.RequestError as e:
+            print(f"Request error occurred: {e}")
+        except httpx.ConnectTimeout:
+            print("The request timed out while trying to connect to the remote server.")
+        except httpx.ReadTimeout:
+            print("The server did not send any data in the allotted amount of time.")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
+        return gift_count
+
+    async def vk_gifts_info(self, db: AsyncSession):
+        version = 5.89
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.vk.com/method/gifts.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_id": self.user_id,
+                        "count": 1_0
+                    },
+                )
+            response.raise_for_status()
+            data = response.json()
+
+            print("Full response:", data)
+            if 'error' in data:
+                raise ValueError(f"API error: {data['error']['error_msg']}")
+
+            gifts_data = data.get("response", {}).get("items", [])
+            if not gifts_data:
+                raise ValueError("Key 'items' not found in the response or no gifts available")
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except httpx.RequestError as e:
+            print(f"Request error occurred: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+        else:
+            print("check")
+            for gift in gifts_data:
+                existing_gift = await db.get(GiftInfo, gift["id"])
+                if existing_gift:
+                    print(
+                        f"Подарок {gift['id']} уже существует в базе данных."
+                    )
+                else:
+                    new_gift = GiftInfo(
+                        id=gift["id"],
+                        from_id=gift.get("from_id"),
+                        message=gift.get("message"),
+                        date=gift.get("date"),
+                        gift_id=gift.get("gift", {}).get("id"),
+                        thumb_256=gift.get("gift", {}).get("thumb_256"),
+                        thumb_96=gift.get("gift", {}).get("thumb_96"),
+                        thumb_48=gift.get("gift", {}).get("thumb_48"),
+                    )
+                    db.add(new_gift)
+                    await db.commit()
+                    print(f"Подарок {gift['id']} сохранен в базу данных.")
+            return gifts_data
+
+    async def vk_gifts_count(self, db: AsyncSession):
+        version = 5.89
+        gift_count = 0
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.vk.com/method/gifts.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_id": self.user_id,
+                        "count": 20_000 # wHy limit 19_175??
+                    },
+                )
+            response.raise_for_status()
+            data = response.json()
+
+            print("Full response:", data)
+            if 'error' in data:
+                raise ValueError(f"API error: {data['error']['error_msg']}")
+
+            gifts_data = data.get("response", {}).get("items", [])
+            gift_count = len(gifts_data)
+
+            existing_gift_count = await db.get(GiftCount, self.user_id)
+            if existing_gift_count:
+                existing_gift_count.count = gift_count
+            else:
+                new_gift_count = GiftCount(user_id=self.user_id, count=gift_count)
+                db.add(new_gift_count)
+
+            await db.commit()
+            print(f"Количество подарков для пользователя {self.user_id} сохранено в базу данных: {gift_count}")
+
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except httpx.RequestError as e:
+            print(f"Request error occurred: {e}")
+        except httpx.ConnectTimeout:
+            print("The request timed out while trying to connect to the remote server.")
+        except httpx.ReadTimeout:
+            print("The server did not send any data in the allotted amount of time.")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
+        return gift_count
 
     async def vk_wall_posts(self, db: AsyncSession):
         version = 5.137

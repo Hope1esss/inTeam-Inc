@@ -33,11 +33,29 @@ async def get_user_info(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/gifts_info/{user_id}")
+async def get_gifts_info(user_id: int, access_token: str, db: AsyncSession = Depends(get_session)):
+    vk_service = Api(user_id=user_id, token=access_token)
+    try:
+        gifts_info = await vk_service.vk_gifts_info(db)
+        return {"response": gifts_info}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/gifts_count/{user_id}")
+async def get_gifts_count(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+    vk_service = Api(user_id=user_id, token=access_token)
+    try:
+        gifts_count = await vk_service.vk_gifts_count(db)
+        return {"gift_count": gifts_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/wall_posts/{user_id}")
-async def get_wall_posts(
-    user_id: str, access_token: str, db: AsyncSession = Depends(get_session)
-):
-    api = Api(user_id, access_token)
+async def get_wall_posts(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+    api = Api(user_id=user_id, token=access_token)
     try:
         data = await api.vk_wall_posts(db)
         return data

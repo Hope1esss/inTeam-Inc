@@ -14,6 +14,25 @@ class Hint(Base):
     faculty = Column(String, nullable=True)
 
 
+class GiftInfo(Base):
+    __tablename__ = "gifts_info"
+    id = Column(Integer, primary_key=True, index=True)
+    from_id = Column(Integer, nullable=True)
+    message = Column(String, nullable=True)
+    date = Column(Integer)
+    gift_id = Column(Integer, nullable=True)
+    thumb_256 = Column(String, nullable=True)
+    thumb_96 = Column(String, nullable=True)
+    thumb_48 = Column(String, nullable=True)
+
+
+class GiftCount(Base):
+    __tablename__ = "gift_counts"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, unique=True)
+    count = Column(Integer)
+
+
 class Post(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True, index=True)
