@@ -6,7 +6,6 @@ from app.api.core.config import settings
 
 from app.api.db.init_db import create_db_and_tables
 from app.api.v1.endpoints import router as api_v1_router
-from app.api.v1.endpoints.user import router as user_router
 
 
 app = FastAPI()
