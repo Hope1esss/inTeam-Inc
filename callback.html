@@ -8,16 +8,17 @@
     <link rel="stylesheet" href="./assets/styles/style.css">
 </head>
 <body>
-<script>
+<script type="module">
+    import CONFIG from "./config.js";
     async function getAccessToken() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
 
         console.log("Code:", code);
-
+        console.log("config", CONFIG.RESPONSE)
         if (code) {
             try {
-                const response = await fetch('http://localhost:8000/api/v1/token/get_access_token', {
+                const response = await fetch(`http://${CONFIG.RESPONSE}:8000/api/v1/token/get_access_token`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -61,13 +62,14 @@
     </form>
 </div>
 
-<script>
+<script type="module">
+    import CONFIG from "./config.js";
     async function registerUser(event) {
         event.preventDefault();
 
         const password = document.getElementById('password').value;
 
-        const response = await fetch('http://localhost:8000/api/v1/auth/register_vk', {
+        const response = await fetch(`http://${CONFIG.RESPONSE}:8000/api/v1/auth/register_vk`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

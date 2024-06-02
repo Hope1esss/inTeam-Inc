@@ -1,5 +1,5 @@
 import {redirectToVKAuth} from './auth.js';
-
+import CONFIG from "./config.js";
 document.addEventListener('DOMContentLoaded', function () {
     const username = localStorage.getItem('username');
     const avatarUrl = localStorage.getItem('avatar_url');
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
+            const response = await fetch(`http://${CONFIG.RESPONSE}:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
