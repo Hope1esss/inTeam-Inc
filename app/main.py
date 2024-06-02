@@ -11,7 +11,6 @@ from app.api.v1.endpoints.user import router as user_router
 
 app = FastAPI()
 app.include_router(api_v1_router, prefix="/api/v1")
-app.include_router(user_router, prefix="/api/v1/users")
 
 origins = [
     "http://localhost",
