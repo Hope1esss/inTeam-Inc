@@ -1,7 +1,8 @@
+// auth.js
+
 import CONFIG from "./config.js";
 
-
-function redirectToVKAuth() {
+export function redirectToVKAuth() {
     const client_id = CONFIG.CLIENT_ID; // Замените на ваш client_id
     const redirect_uri = encodeURIComponent(CONFIG.REDIRECT_URI); // URL, на который будет передан code
     const display = 'page'; // Отображение в отдельном окне
