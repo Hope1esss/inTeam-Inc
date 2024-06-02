@@ -28,57 +28,24 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', async function () {
-        // Получение идентификатора пользователя и токена из localStorage
-        const userId = localStorage.getItem('user_id');
-        const accessToken = localStorage.getItem('access_token');
-
-        if (!userId || !accessToken) {
-            // Если данные отсутствуют, перенаправляем на страницу входа
-            window.location.href = 'login.html';
-            return;
-        }
-
-        try {
-            // Выполнение запроса к API для получения данных о пользователе
-            const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-
-            if (!response.ok) {
-                throw new Error('Ошибка при получении данных о пользователе');
-            }
-
-            // Преобразование ответа в формат JSON
-            const userInfo = await response.json();
-
-            // Сохранение данных в localStorage
-            localStorage.setItem('vk_user_data', JSON.stringify(userInfo));
-
-            // Отображение данных о пользователе на странице
-            displayUserInfo(userInfo);
-        } catch (error) {
-            console.error('Ошибка:', error);
-            document.getElementById('user-info').innerHTML = '<p>Ошибка при получении данных о пользователе.</p>';
-        }
-    });
-
-    // Функция для отображения данных о пользователе на странице
-    function displayUserInfo(userInfo) {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Получение данных пользователя из localStorage
+        const userInfo = JSON.parse(localStorage.getItem('vk_user_data'));
         const userInfoDiv = document.getElementById('user-info');
 
-        userInfoDiv.innerHTML = `
-            <p><strong>Имя:</strong> ${userInfo.name || 'Неизвестно'}</p>
-            <p><strong>Пол:</strong> ${userInfo.gender || 'Неизвестно'}</p>
-            <p><strong>Возраст:</strong> ${userInfo.age || 'Неизвестно'}</p>
-            <p><strong>Город:</strong> ${userInfo.city || 'Неизвестно'}</p>
-            <p><strong>Образование:</strong> ${userInfo.education || 'Неизвестно'}</p>
-            <p><strong>Количество друзей:</strong> ${userInfo.friends_count || 'Неизвестно'}</p>
-        `;
-    }
+        if (userInfo && userInfo.response && userInfo.response[0]) {
+            const user = userInfo.response[0];
+            userInfoDiv.innerHTML = `
+                <p><strong>Имя:</strong> ${user.first_name || 'Неизвестно'} ${user.last_name || 'Неизвестно'}</p>
+                <p><strong>Пол:</strong> ${user.sex === 1 ? 'Женский' : user.sex === 2 ? 'Мужской' : 'Неизвестно'}</p>
+                <p><strong>Дата рождения:</strong> ${user.bdate || 'Неизвестно'}</p>
+                <p><strong>Город:</strong> ${user.city ? user.city.title : 'Неизвестно'}</p>
+                <p><strong>Образование:</strong> ${user.university_name || 'Неизвестно'}</p>
+            `;
+        } else {
+            userInfoDiv.innerHTML = '<p>Информация о пользователе не найдена.</p>';
+        }
+    });
 </script>
 </body>
 </html>
