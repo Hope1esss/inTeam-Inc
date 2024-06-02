@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import Column, Integer, String,  UniqueConstraint, Boolean, DateTime
 
 from app.api.db.base import Base
 
@@ -17,20 +17,18 @@ class Hint(Base):
 
 class GiftInfo(Base):
     __tablename__ = "gifts_info"
-    id = Column(Integer, primary_key=True, index=True)
-    from_id = Column(Integer, nullable=True)
-    message = Column(String, nullable=True)
-    date = Column(Integer)
-    gift_id = Column(Integer, nullable=True)
-    thumb_256 = Column(String, nullable=True)
-    thumb_96 = Column(String, nullable=True)
-    thumb_48 = Column(String, nullable=True)
+    user_id = Column(Integer, primary_key=True, nullable=False)
+    from_id = Column(Integer, primary_key=True, nullable=False)
+    from_id_count = Column(Integer, nullable=False, default=0)
+
+    __table_args__ = (
+        UniqueConstraint('user_id', 'from_id', name='unique_user_from'),
+    )
 
 
 class GiftCount(Base):
-    __tablename__ = "gift_counts"
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(String, unique=True)
+    __tablename__ = "gift_count"
+    user_id = Column(String, primary_key=True, unique=True)
     count = Column(Integer)
 
 
