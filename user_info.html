@@ -17,12 +17,7 @@
     <main class="main">
         <div class="main-text">Информация о пользователе ВК</div>
         <div id="user-info" class="user-info">
-            <p><strong>Имя:</strong> <span id="user-name"></span></p>
-            <p><strong>Возраст:</strong> <span id="user-age"></span></p>
-            <p><strong>Пол:</strong> <span id="user-gender"></span></p>
-            <p><strong>Город:</strong> <span id="user-city"></span></p>
-            <p><strong>Количество друзей:</strong> <span id="user-friends"></span></p>
-            <p><strong>Образование:</strong> <span id="user-education"></span></p>
+            <!-- Здесь будет отображена информация о пользователе -->
         </div>
     </main>
     <footer class="footer">
@@ -34,38 +29,56 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', async function () {
-        const userInfo = JSON.parse(localStorage.getItem('vk_user_data'));
+        // Получение идентификатора пользователя и токена из localStorage
+        const userId = localStorage.getItem('user_id');
+        const accessToken = localStorage.getItem('access_token');
 
-        if (!userInfo) {
-            document.getElementById('user-info').innerHTML = '<p>Информация о пользователе не найдена.</p>';
+        if (!userId || !accessToken) {
+            // Если данные отсутствуют, перенаправляем на страницу входа
+            window.location.href = 'login.html';
             return;
         }
 
         try {
+            // Выполнение запроса к API для получения данных о пользователе
             const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('vk_token')}`
-                }
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
 
             if (!response.ok) {
-                throw new Error('Ошибка при получении данных пользователя');
+                throw new Error('Ошибка при получении данных о пользователе');
             }
 
-            const data = await response.json();
+            // Преобразование ответа в формат JSON
+            const userInfo = await response.json();
 
-            document.getElementById('user-name').textContent = data.name;
-            document.getElementById('user-age').textContent = data.age;
-            document.getElementById('user-gender').textContent = data.gender;
-            document.getElementById('user-city').textContent = data.city;
-            document.getElementById('user-friends').textContent = data.friends_count;
-            document.getElementById('user-education').textContent = data.education;
+            // Сохранение данных в localStorage
+            localStorage.setItem('vk_user_data', JSON.stringify(userInfo));
+
+            // Отображение данных о пользователе на странице
+            displayUserInfo(userInfo);
         } catch (error) {
-            document.getElementById('user-info').innerHTML = `<p>${error.message}</p>`;
+            console.error('Ошибка:', error);
+            document.getElementById('user-info').innerHTML = '<p>Ошибка при получении данных о пользователе.</p>';
         }
     });
+
+    // Функция для отображения данных о пользователе на странице
+    function displayUserInfo(userInfo) {
+        const userInfoDiv = document.getElementById('user-info');
+
+        userInfoDiv.innerHTML = `
+            <p><strong>Имя:</strong> ${userInfo.name || 'Неизвестно'}</p>
+            <p><strong>Пол:</strong> ${userInfo.gender || 'Неизвестно'}</p>
+            <p><strong>Возраст:</strong> ${userInfo.age || 'Неизвестно'}</p>
+            <p><strong>Город:</strong> ${userInfo.city || 'Неизвестно'}</p>
+            <p><strong>Образование:</strong> ${userInfo.education || 'Неизвестно'}</p>
+            <p><strong>Количество друзей:</strong> ${userInfo.friends_count || 'Неизвестно'}</p>
+        `;
+    }
 </script>
 </body>
 </html>
