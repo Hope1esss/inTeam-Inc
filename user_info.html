@@ -35,10 +35,29 @@
 
         if (userInfo && userInfo.response && userInfo.response[0]) {
             const user = userInfo.response[0];
+            
+            // Обработка даты рождения
+            let bdate = user.bdate || 'Неизвестно';
+            if (bdate !== 'Неизвестно') {
+                const bdateParts = bdate.split('.');
+                const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+                const day = bdateParts[0];
+                const monthIndex = parseInt(bdateParts[1], 10) - 1;
+                if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
+                    const month = monthNames[monthIndex];
+                    if (bdateParts.length === 3 && bdateParts[2]) {
+                        const year = bdateParts[2];
+                        bdate = `${day} ${month} ${year}`;
+                    } else {
+                        bdate = `${day} ${month}`;
+                    }
+                }
+            }
+
             userInfoDiv.innerHTML = `
                 <p><strong>Имя:</strong> ${user.first_name || 'Неизвестно'} ${user.last_name || 'Неизвестно'}</p>
                 <p><strong>Пол:</strong> ${user.sex === 1 ? 'Женский' : user.sex === 2 ? 'Мужской' : 'Неизвестно'}</p>
-                <p><strong>Дата рождения:</strong> ${user.bdate || 'Неизвестно'}</p>
+                <p><strong>Дата рождения:</strong> ${bdate}</p>
                 <p><strong>Город:</strong> ${user.city ? user.city.title : 'Неизвестно'}</p>
                 <p><strong>Образование:</strong> ${user.university_name || 'Неизвестно'}</p>
             `;
