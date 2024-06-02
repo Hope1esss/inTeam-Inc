@@ -8,17 +8,15 @@
     <link rel="stylesheet" href="./assets/styles/style.css">
 </head>
 <body>
-<script type="module">
-    import CONFIG from "./config.js";
+<script>
     async function getAccessToken() {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
 
         console.log("Code:", code);
-        console.log("config", CONFIG.RESPONSE)
         if (code) {
             try {
-                const response = await fetch(`http://${CONFIG.RESPONSE}:8000/api/v1/token/get_access_token`, {
+                const response = await fetch(`http://localhost:8000/api/v1/token/get_access_token`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -39,7 +37,6 @@
                 window.expires_in = data.expires_in;
 
                 // Показ формы для ввода пароля (только для регистрации)
-
                 document.getElementById('register-form').style.display = 'block';
 
             } catch (error) {
@@ -50,26 +47,12 @@
         }
     }
 
-    getAccessToken();
-</script>
-
-<div class="container-callback">
-    <img src="./assets/images/lologo.svg" alt="logo" class="logo-center">
-<!-- Форма для ввода пароля (только для регистрации) -->
-    <form id="register-form" onsubmit="registerUser(event)">
-        <input type="password" id="password" placeholder="Enter your password" required>
-        <button type="submit" class="header__button-signUp">submit</button>
-    </form>
-</div>
-
-<script type="module">
-    import CONFIG from "./config.js";
     async function registerUser(event) {
         event.preventDefault();
 
         const password = document.getElementById('password').value;
 
-        const response = await fetch(`http://${CONFIG.RESPONSE}:8000/api/v1/auth/register_vk`, {
+        const response = await fetch(`http://localhost:8000/api/v1/auth/register_vk`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -100,7 +83,16 @@
             alert('Error: ' + errorData.detail);
         }
     }
-
+    getAccessToken()
 </script>
+
+<div class="container-callback">
+    <img src="./assets/images/lologo.svg" alt="logo" class="logo-center">
+    <!-- Форма для ввода пароля (только для регистрации) -->
+    <form id="register-form" onsubmit="registerUser(event)" style="display: none;">
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button type="submit" class="header__button-signUp">Submit</button>
+    </form>
+</div>
 </body>
 </html>
