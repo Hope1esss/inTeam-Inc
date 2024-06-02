@@ -1,9 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.db.session import get_session
+from sqlalchemy.future import select
 from app.api.schemas.user import UserCreate, UserLogin, User
 from app.api.services.api import Api
-from app.api.services.gigachat import gigachat_short_content
+from langchain.schema import HumanMessage
+from langchain.chat_models.gigachat import GigaChat
+from app.api.core.config import settings
+from app.api.models.vk_api import Hint
+import re
 from app.api.services.user_service import (
     create_user,
     login_user,
@@ -11,6 +16,8 @@ from app.api.services.user_service import (
     get_current_user,
 )
 from app.api.core.config import settings
+from pydantic import BaseModel
+
 
 router = APIRouter()
 
@@ -68,23 +75,51 @@ async def get_wall_posts(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/analyze/{user_id}")
-async def analyze_user(user_id: str, db: AsyncSession = Depends(get_session)):
-    try:
-        data = await analyze_with_gigachat(db, user_id)
-        return {"response": data}
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+chat = GigaChat(credentials=settings.GIGACHAT_API_KEY, verify_ssl_certs=False)
 
 
-@router.post("/analyze_with_gigachat/{user_id}")
-async def gigachat_short_content(user_id: str, db: AsyncSession = Depends(get_session)):
+class PromptRequest(BaseModel):
+    promt: str
+    user_id: int
+
+
+@router.post("/short_content/{user_id}")
+async def gigachat_short_content(user_id: int, db: AsyncSession = Depends(get_session)):
+    """
+    Эта функция взаимодействует с моделью GigaChat для создания короткого контента на основе данных пользователя.
+
+    Parameters:
+    promt_request (PromptRequest): Входной запрос, содержащий текст и ID пользователя.
+
+    Returns:
+    str: Сгенерированный контент на основе данных пользователя.
+
+    Raises:
+    HTTPException: Если данные пользователя не найдены или возникает ошибка взаимодействия с моделью GigaChat.
+    """
     try:
-        data = await gigachat_short_content(db, user_id)
-        return {"response": data}
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        result = await db.execute(select(Hint).where(Hint.id == user_id))
+        hint = result.scalars().first()
+        if not hint:
+            raise HTTPException(
+                status_code=404, detail="User not found in the database"
+            )
+
+        prompt = f"Ты — профессиональный психолог с опытом описания человека по его характеристикам. Для генерации описания человека ты изучаешь потенциальную целевую аудиторию и оптимизируешь свои навыки так, чтобы они наиболее точно раскрывали харктер человека. Создай текст описания человека с привлекающим внимание заголовком и убедительным описанием, который максимально описывает его по критериям.\n\nДанные пользователя:\nПолное имя: {hint.full_name}\nПол: {hint.sex}\nДата рождения: {hint.bdate}\nГород: {hint.city}\nОбразование: {hint.education}\nФакультет: {hint.faculty}"
+
+        response = (
+            chat([HumanMessage(content=prompt)])
+            .content.replace("\n", " ")
+            .replace("/", "")
+            .replace('"', "")
+            .replace('"Заголовок: ', "")
+            .replace("Заголовок:", "")
+            .replace("Описание:", "")
+        )
+        cleaned_text = re.sub(r"\s+", " ", response)
+        hint.description = cleaned_text
+        db.add(hint)
+        await db.commit()
+        return cleaned_text
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

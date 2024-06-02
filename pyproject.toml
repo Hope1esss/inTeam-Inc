@@ -34,7 +34,8 @@ pytest-mock = "^3.14.0"
 urllib3 = "1.26.16"
 langchain-community = "^0.2.1"
 gigachain = "^0.2.0" 
-gigachat = "^0.1.27" 
+gigachat = "^0.1.27"
+gigachain_core = "^0.2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.0"

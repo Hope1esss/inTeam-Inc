@@ -12,6 +12,7 @@ class Hint(Base):
     city = Column(String, nullable=True)
     education = Column(String, nullable=True)
     faculty = Column(String, nullable=True)
+    description  = Column(String, nullable=True)
 
 
 class GiftInfo(Base):
