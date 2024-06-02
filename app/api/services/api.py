@@ -16,11 +16,6 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 Base = declarative_base()
 async_session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
-GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
-GIGACHAT_PROMPT = (
-    "Я предоставлю тебе данные человека, напиши что ты думаешь о его интересах: "
-    "{full_name}, {sex}, {bdate}, {city}, {education}, {faculty}"
-)
 from app.api.models.vk_api import Post, Hint, GiftInfo, GiftCount
 
 
@@ -102,19 +97,21 @@ class Api:
                         "access_token": self.token,
                         "v": version,
                         "user_id": self.user_id,
-                        "count": 1_0
+                        "count": 1_0,
                     },
                 )
             response.raise_for_status()
             data = response.json()
 
             print("Full response:", data)
-            if 'error' in data:
+            if "error" in data:
                 raise ValueError(f"API error: {data['error']['error_msg']}")
 
             gifts_data = data.get("response", {}).get("items", [])
             if not gifts_data:
-                raise ValueError("Key 'items' not found in the response or no gifts available")
+                raise ValueError(
+                    "Key 'items' not found in the response or no gifts available"
+                )
         except httpx.HTTPStatusError as e:
             print(f"HTTP error occurred: {e.response.status_code}")
         except httpx.RequestError as e:
@@ -126,9 +123,7 @@ class Api:
             for gift in gifts_data:
                 existing_gift = await db.get(GiftInfo, gift["id"])
                 if existing_gift:
-                    print(
-                        f"Подарок {gift['id']} уже существует в базе данных."
-                    )
+                    print(f"Подарок {gift['id']} уже существует в базе данных.")
                 else:
                     new_gift = GiftInfo(
                         id=gift["id"],
@@ -156,14 +151,14 @@ class Api:
                         "access_token": self.token,
                         "v": version,
                         "user_id": self.user_id,
-                        "count": 20_000 # wHy limit 19_175??
+                        "count": 20_000,  # wHy limit 19_175??
                     },
                 )
             response.raise_for_status()
             data = response.json()
 
             print("Full response:", data)
-            if 'error' in data:
+            if "error" in data:
                 raise ValueError(f"API error: {data['error']['error_msg']}")
 
             gifts_data = data.get("response", {}).get("items", [])
@@ -177,7 +172,9 @@ class Api:
                 db.add(new_gift_count)
 
             await db.commit()
-            print(f"Количество подарков для пользователя {self.user_id} сохранено в базу данных: {gift_count}")
+            print(
+                f"Количество подарков для пользователя {self.user_id} сохранено в базу данных: {gift_count}"
+            )
 
         except httpx.HTTPStatusError as e:
             print(f"HTTP error occurred: {e.response.status_code}")
@@ -202,19 +199,21 @@ class Api:
                         "access_token": self.token,
                         "v": version,
                         "user_id": self.user_id,
-                        "count": 1_0
+                        "count": 1_0,
                     },
                 )
             response.raise_for_status()
             data = response.json()
 
             print("Full response:", data)
-            if 'error' in data:
+            if "error" in data:
                 raise ValueError(f"API error: {data['error']['error_msg']}")
 
             gifts_data = data.get("response", {}).get("items", [])
             if not gifts_data:
-                raise ValueError("Key 'items' not found in the response or no gifts available")
+                raise ValueError(
+                    "Key 'items' not found in the response or no gifts available"
+                )
         except httpx.HTTPStatusError as e:
             print(f"HTTP error occurred: {e.response.status_code}")
         except httpx.RequestError as e:
@@ -226,9 +225,7 @@ class Api:
             for gift in gifts_data:
                 existing_gift = await db.get(GiftInfo, gift["id"])
                 if existing_gift:
-                    print(
-                        f"Подарок {gift['id']} уже существует в базе данных."
-                    )
+                    print(f"Подарок {gift['id']} уже существует в базе данных.")
                 else:
                     new_gift = GiftInfo(
                         id=gift["id"],
@@ -256,14 +253,14 @@ class Api:
                         "access_token": self.token,
                         "v": version,
                         "user_id": self.user_id,
-                        "count": 20_000 # wHy limit 19_175??
+                        "count": 20_000,  # wHy limit 19_175??
                     },
                 )
             response.raise_for_status()
             data = response.json()
 
             print("Full response:", data)
-            if 'error' in data:
+            if "error" in data:
                 raise ValueError(f"API error: {data['error']['error_msg']}")
 
             gifts_data = data.get("response", {}).get("items", [])
@@ -277,7 +274,9 @@ class Api:
                 db.add(new_gift_count)
 
             await db.commit()
-            print(f"Количество подарков для пользователя {self.user_id} сохранено в базу данных: {gift_count}")
+            print(
+                f"Количество подарков для пользователя {self.user_id} сохранено в базу данных: {gift_count}"
+            )
 
         except httpx.HTTPStatusError as e:
             print(f"HTTP error occurred: {e.response.status_code}")
@@ -348,53 +347,6 @@ class Api:
             await db.commit()
             print(f"Записи пользователя {self.user_id} сохранены в базу данных.")
         return posts_data
-
-    async def analyze_with_gigachat(self, db: AsyncSession, user_id: int):
-        async with db.begin():
-            result = await db.execute(select(Hint).where(Hint.id == user_id))
-            hint = result.scalars().first()
-            if not hint:
-                raise ValueError("User not found in the database")
-            
-            prompt = GIGACHAT_PROMPT.format(
-                full_name=hint.full_name,
-                sex=hint.sex,
-                bdate=hint.bdate,
-                city=hint.city,
-                education=hint.education,
-                faculty=hint.faculty
-            )
-
-            payload = {
-                "model": "GigaChat",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                "temperature": 1,
-                "top_p": 0.1,
-                "n": 1,
-                "stream": False,
-                "max_tokens": 512,
-                "repetition_penalty": 1
-            }
-
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    GIGACHAT_API_URL,
-                    json=payload,
-                    headers={
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "Authorization": f"Bearer {settings.GIGACHAT_API_KEY}"
-                    }
-                )
-                response.raise_for_status()
-                gigachat_data = response.json()
-                print("Gigachat response:", gigachat_data)
-                return gigachat_data["choices"][0]["message"]["content"]
 
 
 # async def main():

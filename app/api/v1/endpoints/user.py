@@ -3,15 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.db.session import get_session
 from app.api.schemas.user import UserCreate, UserLogin, User
 from app.api.services.api import Api
+from app.api.services.gigachat import gigachat_short_content
 from app.api.services.user_service import (
     create_user,
     login_user,
     create_access_token,
     get_current_user,
 )
-import asyncio
 from app.api.core.config import settings
-
 
 router = APIRouter()
 
@@ -34,7 +33,9 @@ async def get_user_info(
 
 
 @router.post("/gifts_info/{user_id}")
-async def get_gifts_info(user_id: int, access_token: str, db: AsyncSession = Depends(get_session)):
+async def get_gifts_info(
+    user_id: int, access_token: str, db: AsyncSession = Depends(get_session)
+):
     vk_service = Api(user_id=user_id, token=access_token)
     try:
         gifts_info = await vk_service.vk_gifts_info(db)
@@ -44,7 +45,9 @@ async def get_gifts_info(user_id: int, access_token: str, db: AsyncSession = Dep
 
 
 @router.post("/gifts_count/{user_id}")
-async def get_gifts_count(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+async def get_gifts_count(
+    user_id: str, access_token: str, db: AsyncSession = Depends(get_session)
+):
     vk_service = Api(user_id=user_id, token=access_token)
     try:
         gifts_count = await vk_service.vk_gifts_count(db)
@@ -54,7 +57,9 @@ async def get_gifts_count(user_id: str, access_token: str, db: AsyncSession = De
 
 
 @router.post("/wall_posts/{user_id}")
-async def get_wall_posts(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+async def get_wall_posts(
+    user_id: str, access_token: str, db: AsyncSession = Depends(get_session)
+):
     api = Api(user_id=user_id, token=access_token)
     try:
         data = await api.vk_wall_posts(db)
@@ -64,15 +69,21 @@ async def get_wall_posts(user_id: str, access_token: str, db: AsyncSession = Dep
 
 
 @router.post("/analyze/{user_id}")
-async def analyze_with_gigachat(
-    user_id: str, session: AsyncSession = Depends(get_session)
-):
-    token = settings.CLIENT_SECRET
-    api = Api(user_id=user_id, token=token)
-
+async def analyze_user(user_id: str, db: AsyncSession = Depends(get_session)):
     try:
-        result = await api.analyze_with_gigachat(session, user_id)
-        return {"response": result}
+        data = await analyze_with_gigachat(db, user_id)
+        return {"response": data}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/analyze_with_gigachat/{user_id}")
+async def gigachat_short_content(user_id: str, db: AsyncSession = Depends(get_session)):
+    try:
+        data = await gigachat_short_content(db, user_id)
+        return {"response": data}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:

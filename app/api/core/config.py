@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     CLIENT_SECRET: str
     REDIRECT_URI: str
     SITE: str
-    GIGA_API_KEY: str
+    GIGACHAT_API_KEY: str
 
     class Config:
         env_file = "need.env"
