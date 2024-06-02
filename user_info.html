@@ -18,6 +18,12 @@
         <div class="main-text">Информация о пользователе ВК</div>
         <div id="user-info" class="user-info">
             <!-- Здесь будет отображена информация о пользователе -->
+            <p><strong>Имя:</strong> <span id="user-name"></span></p>
+            <p><strong>Возраст:</strong> <span id="user-age"></span></p>
+            <p><strong>Пол:</strong> <span id="user-gender"></span></p>
+            <p><strong>Город:</strong> <span id="user-city"></span></p>
+            <p><strong>Количество друзей:</strong> <span id="user-friends"></span></p>
+            <p><strong>Образование:</strong> <span id="user-education"></span></p>
         </div>
     </main>
     <footer class="footer">
@@ -28,16 +34,37 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         const userInfo = JSON.parse(localStorage.getItem('vk_user_data'));
-        const userInfoDiv = document.getElementById('user-info');
 
-        if (userInfo) {
-            userInfoDiv.innerHTML = `
-                <pre>${JSON.stringify(userInfo, null, 2)}</pre>
-            `;
-        } else {
-            userInfoDiv.innerHTML = '<p>Информация о пользователе не найдена.</p>';
+        if (!userInfo) {
+            document.getElementById('user-info').innerHTML = '<p>Информация о пользователе не найдена.</p>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('vk_token')}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при получении данных пользователя');
+            }
+
+            const data = await response.json();
+
+            document.getElementById('user-name').textContent = data.name;
+            document.getElementById('user-age').textContent = data.age;
+            document.getElementById('user-gender').textContent = data.gender;
+            document.getElementById('user-city').textContent = data.city;
+            document.getElementById('user-friends').textContent = data.friends_count;
+            document.getElementById('user-education').textContent = data.education;
+        } catch (error) {
+            document.getElementById('user-info').innerHTML = `<p>${error.message}</p>`;
         }
     });
 </script>
