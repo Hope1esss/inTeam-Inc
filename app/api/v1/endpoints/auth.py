@@ -9,10 +9,17 @@ from app.api.db.session import get_session
 from app.api.schemas.token import Token
 from app.api.schemas.user import UserCreate, UserLogin, User, RegisterVk, LoginVk
 import app.api.models.user as user_m
-from app.api.services.user_service import create_user, login_user, create_access_token, get_current_user, get_vk_user_info
+from app.api.services.user_service import (
+    create_user,
+    login_user,
+    create_access_token,
+    get_current_user,
+    get_vk_user_info,
+)
 from fastapi import Request
 from fastapi.responses import JSONResponse
 import requests
+
 router = APIRouter()
 
 
@@ -28,22 +35,21 @@ async def login(
 ):
     user = await login_user(user_data=user, session=session)
     access_token = create_access_token(data={"sub": str(user.id)})
-    response.set_cookie(key="jwt",
-                        value=access_token,
-                        path="/",
-                        samesite=None)
-    return {'message': 'Login successful'}
+    response.set_cookie(key="jwt", value=access_token, path="/", samesite=None)
+    return {"message": "Login successful"}
 
 
 @router.post("/register_vk")
 async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_session)):
-    result = await db.execute(select(user_m.User).filter(user_m.User.vk_id == request.vk_id))
+    result = await db.execute(
+        select(user_m.User).filter(user_m.User.vk_id == request.vk_id)
+    )
     user = result.scalars().first()
 
     if user:
         vk_user_info = await get_vk_user_info(request.access_token)
         username = f"{vk_user_info['first_name']} {vk_user_info['last_name']}"
-        avatar_url = vk_user_info.get('photo_200', '')
+        avatar_url = vk_user_info.get("photo_200", "")
         print(vk_user_info)
         user.vk_token = request.access_token
         user.expires_in = request.expires_in
@@ -57,12 +63,12 @@ async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_sess
             "username": username,
             "avatar_url": avatar_url,
             "expires_in": request.expires_in,
-            "access_token": request.access_token
+            "access_token": request.access_token,
         }
 
     vk_user_info = await get_vk_user_info(request.access_token)
     username = f"{vk_user_info['first_name']} {vk_user_info['last_name']}"
-    avatar_url = vk_user_info.get('photo_200', '')
+    avatar_url = vk_user_info.get("photo_200", "")
     new_user = user_m.User(
         vk_id=request.vk_id,
         vk_token=request.access_token,
@@ -80,8 +86,5 @@ async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_sess
         "username": username,
         "avatar_url": avatar_url,
         "expires_in": request.expires_in,
-        "access_token": request.access_token
+        "access_token": request.access_token,
     }
-
-
-

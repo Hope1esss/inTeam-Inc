@@ -22,7 +22,9 @@ async def get_user_id(user: UserCreate, db: AsyncSession = Depends(get_session))
 
 
 @router.post("/user_info/{user_id}", response_model=dict)
-async def get_user_info(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+async def get_user_info(
+    user_id: str, access_token: str, db: AsyncSession = Depends(get_session)
+):
     api = Api(user_id, access_token)
     try:
         data = await api.vk_user_info(db)
@@ -32,7 +34,9 @@ async def get_user_info(user_id: str, access_token: str, db: AsyncSession = Depe
 
 
 @router.post("/wall_posts/{user_id}")
-async def get_wall_posts(user_id: str, access_token: str, db: AsyncSession = Depends(get_session)):
+async def get_wall_posts(
+    user_id: str, access_token: str, db: AsyncSession = Depends(get_session)
+):
     api = Api(user_id, access_token)
     try:
         data = await api.vk_wall_posts(db)

@@ -15,6 +15,7 @@ from app.api.schemas.user import UserCreate, UserLogin
 from app.api.services.security import hash_password, verify_password
 import requests
 
+
 async def create_user(user_data: UserCreate, session: AsyncSession) -> User:
     result = await session.execute(
         select(User).filter(User.username == user_data.username)
@@ -79,15 +80,13 @@ async def get_current_user(
 
 async def get_vk_user_info(access_token: str):
     url = "https://api.vk.com/method/users.get"
-    params = {
-        "access_token": access_token,
-        "v": "5.131",
-        'fields': 'photo_200'
-    }
+    params = {"access_token": access_token, "v": "5.131", "fields": "photo_200"}
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params)
         response_data = response.json()
         if "error" in response_data:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error retrieving user info from VK")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error retrieving user info from VK",
+            )
         return response_data["response"][0]
-

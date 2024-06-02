@@ -4,11 +4,17 @@ import httpx
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy import Column, Integer, String, MetaData, Table
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.future import select
 
 from app.api.db.session import get_session
 from app.api.models.vk_api import Post, Hint
+from app.api.core.config import settings
+
+DATABASE_URL = settings.DATABASE_URL
+engine = create_async_engine(DATABASE_URL, echo=True)
+Base = declarative_base()
+async_session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
 
 class Api:
@@ -45,25 +51,37 @@ class Api:
         except Exception as e:
             print(f"Unexpected error: {e}")
         else:
-            print("check")
+            # Обработка данных
+            processed_data = {
+                "sex": (
+                    "Мужской"
+                    if user_data.get("sex") == 2
+                    else "Женский" if user_data.get("sex") == 1 else ""
+                ),
+                "bdate": user_data.get("bdate", ""),
+                "city": user_data.get("city", {}).get("title", ""),
+                "education": user_data.get("university_name", ""),
+                "faculty": user_data.get("faculty_name", ""),
+            }
+            print("Processed data:", processed_data)
+
             existing_user = await db.get(Hint, user_data["id"])
-            print("Godo")
             if existing_user:
-                print(
-                    f"Пользователь {self.user_id} уже существует в базе данных."
-                )
+                print(f"Пользователь {self.user_id} уже существует в базе данных.")
             else:
                 new_hint = Hint(
                     id=user_data["id"],
-                    sex=user_data["sex"],
-                    bdate=user_data.get("bdate"),
-                    city=user_data.get("city", {}).get("title"),
-                    education=user_data.get("university_name"),
+                    full_name=user_data["first_name"] + " " + user_data["last_name"],
+                    sex=processed_data["sex"],
+                    bdate=processed_data["bdate"],
+                    city=processed_data["city"],
+                    education=processed_data["education"],
+                    faculty=processed_data["faculty"],
                 )
                 db.add(new_hint)
                 await db.commit()
                 print(f"Пользователь {self.user_id} сохранен в базу данных.")
-            return user_data
+            return data
 
     async def vk_wall_posts(self, db: AsyncSession):
         version = 5.137
@@ -125,17 +143,15 @@ class Api:
 
 # async def main():
 #     user_id = "id264457326"  # Укажите ID пользователя
-#     api = Api(user_id)
-#     await Api.async_db_setup()
-#     await api.vk_user_info()
-#     await api.vk_wall_posts()
-#     # Примерчик:
-#     # user_id = "we1lman"  # Укажите ID пользователя
-#     # api = Api(user_id)
-#     # await Api.async_db_setup()
-#     # await api.vk_user_info()
-#     # await api.vk_wall_posts()
-#
-#
+#     token = os.getenv("TOKEN")  # Убедитесь, что токен загружен из переменной окружения
+#     api = Api(user_id, token)
+
+#     # Пример использования сессии базы данных
+#     async with async_session() as session:
+#         await api.vk_user_info(session)
+#         await api.vk_wall_posts(session)
+#         await api.get_gigachat_data()  # Вызов функции для получения данных из Gigachat
+
+
 # if __name__ == "__main__":
 #     asyncio.run(main())

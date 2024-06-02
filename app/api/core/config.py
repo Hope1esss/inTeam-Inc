@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     CLIENT_SECRET: str
     REDIRECT_URI: str
     SITE: str
+    GIGA_CLIENT_ID: str
+    GIGA_SCOPE: str
+    GIGA_CLIENT_SECRET: str
+    GIGA_AUTH: str
 
     class Config:
         env_file = "need.env"
