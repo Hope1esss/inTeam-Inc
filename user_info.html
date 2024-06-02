@@ -43,7 +43,7 @@
 
         try {
             const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('vk_token')}`
