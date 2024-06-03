@@ -15,6 +15,9 @@ from app.api.core.config import settings
 from app.api.models.vk_api import Post, Hint, GiftInfo, GiftCount
 
 
+from collections import OrderedDict
+
+
 class Api:
     def __init__(self, user_id, token):
         self.user_id = user_id
@@ -82,7 +85,52 @@ class Api:
                 await db.commit()
                 print(f"Пользователь {self.user_id} сохранен в базу данных.")
             return data
-    
+
+    async def get_user_names(self, user_ids):
+        version = 5.89
+        user_names = {}
+        individual_user_ids = [user_id for user_id in user_ids if user_id > 0]
+        group_ids = [user_id for user_id in user_ids if user_id < 0]
+
+        try:
+            if individual_user_ids:
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(
+                        "https://api.vk.com/method/users.get",
+                        params={
+                            "access_token": self.token,
+                            "v": version,
+                            "user_ids": ",".join(map(str, individual_user_ids)),
+                            "fields": "first_name,last_name",
+                        },
+                    )
+                response.raise_for_status()
+                data = response.json()
+                user_names.update(
+                    {user['id']: f"{user['first_name']} {user['last_name']}" for user in data.get("response", [])})
+
+            if group_ids:
+                async with httpx.AsyncClient() as client:
+                    response = await client.get(
+                        "https://api.vk.com/method/groups.getById",
+                        params={
+                            "access_token": self.token,
+                            "v": version,
+                            "group_ids": ",".join(map(lambda x: str(abs(x)), group_ids)),
+                            "fields": "name",
+                        },
+                    )
+                response.raise_for_status()
+                data = response.json()
+                user_names.update({-group['id']: group['name'] for group in data.get("response", [])})
+
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
+        return user_names
+
     async def vk_gifts_info(self, db: AsyncSession):
         version = 5.89
         from_id_count = {}
@@ -154,13 +202,18 @@ class Api:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-        sorted_from_id_count = tuple(
-            sorted(from_id_count.items(), key=lambda item: item[1], reverse=True)[:5]
+        sorted_from_id_count = sorted(from_id_count.items(), key=lambda item: item[1], reverse=True)[:5]
+
+        user_ids = [item[0] for item in sorted_from_id_count]
+        user_names = await self.get_user_names(user_ids)
+
+        sorted_from_id_count_with_names = OrderedDict(
+            (user_names.get(from_id, str(from_id)), count) for from_id, count in sorted_from_id_count
         )
-        print(sorted_from_id_count)
+        print(sorted_from_id_count_with_names)
 
         print(f"Total gifts received: {total_gifts}")
-        return sorted_from_id_count, sum(from_id_count.values())
+        return sorted_from_id_count_with_names, sum(from_id_count.values())
 
     async def vk_gifts_count(self, db: AsyncSession):
         version = 5.89
