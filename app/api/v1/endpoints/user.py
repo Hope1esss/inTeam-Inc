@@ -83,8 +83,8 @@ class PromptRequest(BaseModel):
     user_id: int
 
 
-@router.post("/short_content/{user_id}")
-async def gigachat_short_content(user_id: int, db: AsyncSession = Depends(get_session)):
+@router.post("/short_content/{user_id}")    
+async def gigachat_short_content(user_id: str, token: str, db: AsyncSession = Depends(get_session)):
     """
     Эта функция взаимодействует с моделью GigaChat для создания короткого контента на основе данных пользователя.
 
@@ -98,6 +98,8 @@ async def gigachat_short_content(user_id: int, db: AsyncSession = Depends(get_se
     HTTPException: Если данные пользователя не найдены или возникает ошибка взаимодействия с моделью GigaChat.
     """
     try:
+        api = Api(user_id=user_id, token=token)
+        user_id = await Api.get_user_id_by_name(api, user_id)
         result = await db.execute(select(Hint).where(Hint.id == user_id))
         hint = result.scalars().first()
         if not hint:

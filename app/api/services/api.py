@@ -51,8 +51,8 @@ class Api:
         else:
             processed_data = {
                 "full_name": user_data.get("first_name", "")
-                             + " "
-                             + user_data.get("last_name", ""),
+                + " "
+                + user_data.get("last_name", ""),
                 "sex": (
                     "Мужской"
                     if user_data.get("sex") == 2
@@ -129,20 +129,23 @@ class Api:
 
                 for from_id, count in from_id_count.items():
                     existing_gift = await db.execute(
-                        select(GiftInfo).where(GiftInfo.user_id == self.user_id, GiftInfo.from_id == from_id)
+                        select(GiftInfo).where(
+                            GiftInfo.user_id == self.user_id,
+                            GiftInfo.from_id == from_id,
+                        )
                     )
                     existing_gift = existing_gift.scalar()
                     if existing_gift:
                         existing_gift.from_id_count = count
                     else:
                         new_gift = GiftInfo(
-                            user_id=self.user_id,
-                            from_id=from_id,
-                            from_id_count=count
+                            user_id=self.user_id, from_id=from_id, from_id_count=count
                         )
                         db.add(new_gift)
                 await db.commit()
-                print(f"Количество подарков для пользователя {self.user_id} сохранено в базу данных.")
+                print(
+                    f"Количество подарков для пользователя {self.user_id} сохранено в базу данных."
+                )
 
         except httpx.HTTPStatusError as e:
             print(f"HTTP error occurred: {e.response.status_code}")
@@ -151,7 +154,9 @@ class Api:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-        sorted_from_id_count = dict(sorted(from_id_count.items(), key=lambda item: item[1], reverse=True))
+        sorted_from_id_count = dict(
+            sorted(from_id_count.items(), key=lambda item: item[1], reverse=True)
+        )
 
         print(f"Total gifts received: {total_gifts}")
         return sorted_from_id_count, len(from_id_count), sum(from_id_count.values())
@@ -261,6 +266,30 @@ class Api:
             await db.commit()
             print(f"Записи пользователя {self.user_id} сохранены в базу данных.")
         return posts_data
+
+    async def get_user_id_by_name(self, screen_name: str):
+        version = 5.131
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.vk.com/method/users.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_ids": screen_name,
+                        "lang": 0,
+                    },
+                )
+            response.raise_for_status()
+            data = response.json()
+            print("Full response:", data)
+            user_data = data.get("response", [None])[0]
+            if user_data is None:
+                raise ValueError("User not found")
+            return user_data["id"]
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+
 
 # async def main():
 #     user_id = "id264457326"  # Укажите ID пользователя
