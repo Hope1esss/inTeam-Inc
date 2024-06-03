@@ -9,6 +9,7 @@ from langchain.chat_models.gigachat import GigaChat
 from app.api.core.config import settings
 from app.api.models.vk_api import Hint
 import re
+from app.api.services.user_service import get_vk_main_photo
 from app.api.services.user_service import (
     create_user,
     login_user,
@@ -148,3 +149,14 @@ async def gigachat_short_content(user_id: str, token: Req, db: AsyncSession = De
         return cleaned_text
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/health")
+async def health(user_id: str, access_token: Req):
+    print(
+        "udsfsdffsdfsdfsdfsdfsdfdfsFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+    )
+    api = Api(user_id, access_token.token)
+    user_id = await api.get_user_id_by_name(user_id)
+    print(type(user_id), print(user_id))
+    return await get_vk_main_photo(access_token.token, user_id)

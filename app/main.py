@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.core.config import settings
 from app.api.db.init_db import create_db_and_tables
 from app.api.v1.endpoints import router as api_v1_router
-from app.api.services.user_service import get_vk_main_photo
+
 from app.api.services.api import Api
 from app.api.v1.endpoints.user import Req
 
@@ -35,10 +35,3 @@ async def startup_event():
     await create_db_and_tables()
 
 
-@app.get('/health')
-async def health(user_id: str, access_token: Req):
-    print('udsfsdffsdfsdfsdfsdfsdfdfsFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
-    api = Api(user_id, access_token.token)
-    user_id = await api.get_user_id_by_name(user_id)
-    print(type(user_id), print(user_id))
-    return await get_vk_main_photo(access_token.token, user_id)
