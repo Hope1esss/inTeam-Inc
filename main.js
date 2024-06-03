@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         try {
-            const response = await fetch(`https://opazjuhet5.ru/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
+            const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const result = await response.json();
             console.log(result);
             if (response.ok) {
+                localStorage.setItem("user_id", userId);
                 localStorage.setItem('vk_user_data', JSON.stringify(result));
                 window.location.href = 'user_info.html';
             } else {

@@ -48,7 +48,14 @@
             `;
 
             try {
-                const response = await fetch(`http://localhost:8000/api/v1/user/short_content/${user.id}`);
+                const userId = localStorage.getItem("user_id");
+                const accessToken = localStorage.getItem('vk_token');
+                const response = await fetch(`http://localhost:8000/api/v1/user/short_content/${userId}?user_id=${userId}&access_token=${accessToken}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                });
                 if (!response.ok) {
                     throw new Error('Ошибка при получении ответа GigaChat');
                 }
