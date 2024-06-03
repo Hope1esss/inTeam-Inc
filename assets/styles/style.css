@@ -322,6 +322,7 @@ a {
 }
 
 .header__user-info {
+  text-align: center;
   font-size: 20px;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -353,8 +354,12 @@ a {
 }
 
 .gigachat-response {
+  height: 80%;
   width: 30vw;
   color: #000000;
   background-color: #cc82d1;
   margin-left: 5%;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 5%;
 }
