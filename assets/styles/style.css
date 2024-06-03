@@ -332,11 +332,29 @@ a {
 }
 
 #information {
-  margin: 40px 0 0 230px;
+  text-align: center;
 }
 
 .main-container {
   display: flex;
   height: 80vh;
-  
+
+}
+
+.user-info {
+  margin-left: 5%;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.header-info {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+
+.gigachat-response {
+  width: 30vw;
+  color: #000000;
+  background-color: #cc82d1;
+  margin-left: 5%;
 }
