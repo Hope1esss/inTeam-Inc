@@ -154,12 +154,13 @@ class Api:
         except Exception as e:
             print(f"Unexpected error: {e}")
 
-        sorted_from_id_count = dict(
-            sorted(from_id_count.items(), key=lambda item: item[1], reverse=True)
+        sorted_from_id_count = tuple(
+            sorted(from_id_count.items(), key=lambda item: item[1], reverse=True)[:5]
         )
+        print(sorted_from_id_count)
 
         print(f"Total gifts received: {total_gifts}")
-        return sorted_from_id_count, len(from_id_count), sum(from_id_count.values())
+        return sorted_from_id_count, sum(from_id_count.values())
 
     async def vk_gifts_count(self, db: AsyncSession):
         version = 5.89
