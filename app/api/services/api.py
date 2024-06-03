@@ -82,7 +82,7 @@ class Api:
                 await db.commit()
                 print(f"Пользователь {self.user_id} сохранен в базу данных.")
             return data
-
+    
     async def vk_gifts_info(self, db: AsyncSession):
         version = 5.89
         from_id_count = {}
@@ -286,7 +286,7 @@ class Api:
             user_data = data.get("response", [None])[0]
             if user_data is None:
                 raise ValueError("User not found")
-            return user_data["id"]
+            return int(user_data["id"])
         except httpx.HTTPStatusError as e:
             print(f"HTTP error occurred: {e.response.status_code}")
 

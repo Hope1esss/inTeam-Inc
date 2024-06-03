@@ -90,3 +90,17 @@ async def get_vk_user_info(access_token: str):
                 detail="Error retrieving user info from VK",
             )
         return response_data["response"][0]
+
+
+async def get_vk_main_photo(access_token: str):
+    url = "https://api.vk.com/method/users.get"
+    params = {"access_token": access_token, "v": "5.131", "fields": "photo_max_orig"}
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+        response_data = response.json()
+        if "error" in response_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error retrieving user info from VK",
+            )
+        return response_data["response"][0]

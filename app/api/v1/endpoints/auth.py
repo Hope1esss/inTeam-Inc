@@ -15,6 +15,7 @@ from app.api.services.user_service import (
     create_access_token,
     get_current_user,
     get_vk_user_info,
+    get_vk_main_photo,
 )
 from fastapi import Request
 from fastapi.responses import JSONResponse

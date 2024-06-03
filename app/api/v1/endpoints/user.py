@@ -22,6 +22,15 @@ from pydantic import BaseModel
 router = APIRouter()
 
 
+class PromptRequest(BaseModel):
+    promt: str
+    user_id: int
+
+
+class Req(BaseModel):
+    token: str
+
+
 @router.post("/get_id", response_model=dict)
 async def get_user_id(user: UserCreate, db: AsyncSession = Depends(get_session)):
     pass
@@ -41,24 +50,21 @@ async def get_user_info(
 
 @router.post("/gifts_info/{user_id}")
 async def get_gifts_info(
-    user_id: int, access_token: str, db: AsyncSession = Depends(get_session)
+    user_id: str, token: Req, db: AsyncSession = Depends(get_session)
 ):
-    vk_service = Api(user_id=user_id, token=access_token)
+    api = Api(user_id=user_id, token=token.token)
+    user_id = await Api.get_user_id_by_name(api, user_id)
+    print(user_id)
+    print(type(user_id))
+    result = await db.execute(select(Hint).where(Hint.id == user_id))
+    print(result)
+    hint = result.scalars().first()
+    if not hint:
+        raise HTTPException(status_code=404, detail="User not found in the database")
     try:
-        gifts_info = await vk_service.vk_gifts_info(db)
+        api1 = Api(user_id=user_id, token=token.token)
+        gifts_info = await api1.vk_gifts_info(db)
         return {"response": gifts_info}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/gifts_count/{user_id}")
-async def get_gifts_count(
-    user_id: str, access_token: str, db: AsyncSession = Depends(get_session)
-):
-    vk_service = Api(user_id=user_id, token=access_token)
-    try:
-        gifts_count = await vk_service.vk_gifts_count(db)
-        return {"gift_count": gifts_count}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -78,13 +84,25 @@ async def get_wall_posts(
 chat = GigaChat(credentials=settings.GIGACHAT_API_KEY, verify_ssl_certs=False)
 
 
-class PromptRequest(BaseModel):
-    promt: str
-    user_id: int
+@router.post("/gifts_count/{user_id}")
+async def get_gifts_count(
+    user_id: str, token: Req, db: AsyncSession = Depends(get_session)
+):
+    api = Api(user_id=user_id, token=token.token)
+    user_id = await Api.get_user_id_by_name(api, user_id)
+    print(user_id)
+    result = await db.execute(select(Hint).where(Hint.id == user_id))
+    print(result)
+    hint = result.scalars().first()
+    if not hint:
+        raise HTTPException(status_code=404, detail="User not found in the database")
+    vk_service = Api(user_id=user_id, token=access_token)
+    try:
+        gifts_count = await vk_service.vk_gifts_count(db)
+        return {"gift_count": gifts_count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-
-class Req(BaseModel):
-    token: str
 
 @router.post("/short_content/{user_id}")    
 async def gigachat_short_content(user_id: str, token: Req, db: AsyncSession = Depends(get_session)):
