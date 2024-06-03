@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         try {
-            const response = await fetch(`http://localhost:8000/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
+            const response = await fetch(`https://opazjuhet5.ru/api/v1/user/user_info/${userId}?user_id=${userId}&access_token=${accessToken}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

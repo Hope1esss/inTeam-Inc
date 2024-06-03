@@ -48,7 +48,7 @@
             console.log(userId, accessToken);
             try {
 
-                const response = await fetch(`http://localhost:8000/api/v1/user/short_content/${userId}`, {
+                const response = await fetch(`https://opazjuhet5.ru/api/v1/user/short_content/${userId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -74,7 +74,7 @@
         try {
             const accessToken = localStorage.getItem('vk_token');
             const userId = localStorage.getItem("user_id");
-            const response = await fetch(`http://localhost:8000/api/v1/user/health?user_id=${userId}`, {
+            const response = await fetch(`https://opazjuhet5.ru/api/v1/user/health?user_id=${userId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
