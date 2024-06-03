@@ -17,13 +17,7 @@ app = FastAPI(
 app.include_router(api_v1_router, prefix="/api/v1")
 
 # Настройка CORS
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:5500",
-    f"https://{settings.SITE}",
-]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,

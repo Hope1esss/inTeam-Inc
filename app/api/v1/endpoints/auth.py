@@ -39,7 +39,7 @@ async def login(
     return {"message": "Login successful"}
 
 
-@router.post("/register_vk")
+@router.post("/register_vk", response_model=dict    )
 async def register_user(request: RegisterVk, db: AsyncSession = Depends(get_session)):
     result = await db.execute(
         select(user_m.User).filter(user_m.User.vk_id == request.vk_id)
