@@ -105,6 +105,28 @@ async def get_gifts_count(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/friend_list/{user_id}")
+async def get_friend_list(
+    user_id: str, token: Req, db: AsyncSession = Depends(get_session)
+):
+    api = Api(user_id=user_id, token=token.token)
+    user_id = await Api.get_user_id_by_name(api, user_id)
+    print(user_id)
+    print(type(user_id))
+    result = await db.execute(select(Hint).where(Hint.id == user_id))
+    print(result)
+    hint = result.scalars().first()
+    if not hint:
+        raise HTTPException(status_code=404, detail="User not found in the database")
+    try:
+        api1 = Api(user_id=user_id, token=token.token)
+        friend_list = await api1.vk_get_friend_list(db)
+        return {"response": friend_list}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
 @router.post("/short_content/{user_id}")    
 async def gigachat_short_content(user_id: str, token: Req, db: AsyncSession = Depends(get_session)):
     """

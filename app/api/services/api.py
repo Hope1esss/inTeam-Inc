@@ -215,6 +215,67 @@ class Api:
         print(f"Total gifts received: {total_gifts}")
         return sorted_from_id_count_with_names, sum(from_id_count.values())
 
+    async def vk_get_friend_list(self, db: AsyncSession):
+        version = 5.236
+        fields = "bdate,sex"
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(
+                    "https://api.vk.com/method/friends.get",
+                    params={
+                        "access_token": self.token,
+                        "v": version,
+                        "user_id": self.user_id,
+                        "fields": fields,
+                        "order": "hints"
+                    },
+                )
+            response.raise_for_status()
+            data = response.json()
+
+            print("Full response:", data)
+            friend_list_data = data.get("response", {}).get("items", [])
+            if not friend_list_data:
+                raise ValueError("Key 'items' not found in the response")
+
+            for friend_data in friend_list_data:
+                processed_data = {
+                    "full_name": friend_data.get("first_name", "")
+                                 + " "
+                                 + friend_data.get("last_name", ""),
+                    "sex": (
+                        "Мужской"
+                        if friend_data.get("sex") == 2
+                        else "Женский" if friend_data.get("sex") == 1 else ""
+                    ),
+                    "bdate": friend_data.get("bdate", "")
+                }
+                print("Processed data:", processed_data)
+
+                existing_user = await db.execute(select(Hint).where(Hint.id == friend_data["id"]))
+                existing_user = existing_user.scalars().first()
+                if existing_user:
+                    print(f"Пользователь {friend_data['id']} уже существует в базе данных.")
+                else:
+                    new_friends = Hint(
+                        id=friend_data["id"],
+                        full_name=processed_data["full_name"],
+                        sex=processed_data["sex"],
+                        bdate=processed_data["bdate"],
+                    )
+                    db.add(new_friends)
+            await db.commit()
+            print(f"Список друзей пользователя {self.user_id} сохранен в базу данных.")
+
+            return friend_list_data
+
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error occurred: {e.response.status_code}")
+        except httpx.RequestError as e:
+            print(f"Request error occurred: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
     async def vk_gifts_count(self, db: AsyncSession):
         version = 5.89
         gift_count = 0
