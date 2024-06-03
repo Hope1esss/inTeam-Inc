@@ -92,9 +92,9 @@ async def get_vk_user_info(access_token: str):
         return response_data["response"][0]
 
 
-async def get_vk_main_photo(access_token: str):
+async def get_vk_main_photo(access_token: str, user_id: int):
     url = "https://api.vk.com/method/users.get"
-    params = {"access_token": access_token, "v": "5.131", "fields": "photo_max_orig"}
+    params = {"access_token": access_token, "v": "5.131", "fields": "photo_max_orig", "user_ids": f"{user_id}"}
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params)
         response_data = response.json()
