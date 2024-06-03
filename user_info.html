@@ -19,6 +19,9 @@
         <div id="user-info" class="user-info">
             <!-- Здесь будет отображена информация о пользователе -->
         </div>
+        <div id="gigachat-response" class="gigachat-response">
+            <!-- Здесь будет отображен ответ GigaChat -->
+        </div>
     </main>
     <footer class="footer">
         <div class="footer-about footer-link-container"><a href="#" class="about footer-link">About</a></div>
@@ -28,43 +31,50 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         // Получение данных пользователя из localStorage
         const userInfo = JSON.parse(localStorage.getItem('vk_user_data'));
         const userInfoDiv = document.getElementById('user-info');
+        const gigachatResponseDiv = document.getElementById('gigachat-response');
 
         if (userInfo && userInfo.response && userInfo.response[0]) {
             const user = userInfo.response[0];
-            
-            // Обработка даты рождения
-            let bdate = user.bdate || 'Неизвестно';
-            if (bdate !== 'Неизвестно') {
-                const bdateParts = bdate.split('.');
-                const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-                const day = bdateParts[0];
-                const monthIndex = parseInt(bdateParts[1], 10) - 1;
-                if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < 12) {
-                    const month = monthNames[monthIndex];
-                    if (bdateParts.length === 3 && bdateParts[2]) {
-                        const year = bdateParts[2];
-                        bdate = `${day} ${month} ${year}`;
-                    } else {
-                        bdate = `${day} ${month}`;
-                    }
-                }
-            }
-
             userInfoDiv.innerHTML = `
                 <p><strong>Имя:</strong> ${user.first_name || 'Неизвестно'} ${user.last_name || 'Неизвестно'}</p>
                 <p><strong>Пол:</strong> ${user.sex === 1 ? 'Женский' : user.sex === 2 ? 'Мужской' : 'Неизвестно'}</p>
-                <p><strong>Дата рождения:</strong> ${bdate}</p>
+                <p><strong>Дата рождения:</strong> ${user.bdate ? formatBirthdate(user.bdate) : 'Неизвестно'}</p>
                 <p><strong>Город:</strong> ${user.city ? user.city.title : 'Неизвестно'}</p>
                 <p><strong>Образование:</strong> ${user.university_name || 'Неизвестно'}</p>
             `;
+
+            try {
+                const response = await fetch(`http://localhost:8000/api/v1/user/short_content/${user.id}`);
+                if (!response.ok) {
+                    throw new Error('Ошибка при получении ответа GigaChat');
+                }
+                const data = await response.json();
+                gigachatResponseDiv.innerHTML = `<p><strong>Ответ GigaChat:</strong> ${data.description || 'Неизвестно'}</p>`;
+            } catch (error) {
+                console.error('Ошибка:', error);
+                gigachatResponseDiv.innerHTML = '<p>Ошибка при получении ответа GigaChat.</p>';
+            }
         } else {
             userInfoDiv.innerHTML = '<p>Информация о пользователе не найдена.</p>';
         }
     });
+
+    function formatBirthdate(bdate) {
+        const dateParts = bdate.split('.');
+        const monthNames = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+        if (dateParts.length === 2) {
+            const [day, month] = dateParts;
+            return `${day} ${monthNames[parseInt(month, 10) - 1]}`;
+        } else if (dateParts.length === 3) {
+            const [day, month, year] = dateParts;
+            return `${day} ${monthNames[parseInt(month, 10) - 1]} ${year} года`;
+        }
+        return bdate;
+    }
 </script>
 </body>
 </html>
