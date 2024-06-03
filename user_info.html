@@ -64,6 +64,8 @@
                     throw new Error('Ошибка при получении ответа GigaChat');
                 }
                 const data = await response.json();
+
+
                 gigachatResponseDiv.innerHTML = `<p><strong>Ответ GigaChat:</strong> ${data || 'Неизвестно'}</p>`;
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -72,6 +74,25 @@
         } else {
             userInfoDiv.innerHTML = '<p>Информация о пользователе не найдена.</p>';
         }
+            try {
+                const response = await fetch(`http://localhost:8000/api/v1/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: accessToken
+                    })
+                });
+                if (!response.ok) {
+                    throw new Error('Ошибка при получении ответа ОТ HEALTH');
+                }
+                const data = await response.json();
+                localStorage.setItem('big_photo', data.photo_max_orig);
+                userInfoDiv.innerHTML = `
+                    <img src="${data.photo_max_orig}" alt="Hint Avatar" class="hint-avatar">
+                `;
+            }
     });
 
     function formatBirthdate(bdate) {
