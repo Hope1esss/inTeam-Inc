@@ -38,14 +38,8 @@
         const gigachatResponseDiv = document.getElementById('gigachat-response');
 
         if (userInfo && userInfo.response && userInfo.response[0]) {
-            const user = userInfo.response[0];
-            userInfoDiv.innerHTML = `
-                <p><strong>Имя:</strong> ${user.first_name || 'Неизвестно'} ${user.last_name || 'Неизвестно'}</p>
-                <p><strong>Пол:</strong> ${user.sex === 1 ? 'Женский' : user.sex === 2 ? 'Мужской' : 'Неизвестно'}</p>
-                <p><strong>Дата рождения:</strong> ${user.bdate ? formatBirthdate(user.bdate) : 'Неизвестно'}</p>
-                <p><strong>Город:</strong> ${user.city ? user.city.title : 'Неизвестно'}</p>
-                <p><strong>Образование:</strong> ${user.university_name || 'Неизвестно'}</p>
-            `;
+            
+            
             const userId = localStorage.getItem("user_id");
             const accessToken = localStorage.getItem('vk_token');
             console.log(userId, accessToken);
@@ -74,25 +68,36 @@
         } else {
             userInfoDiv.innerHTML = '<p>Информация о пользователе не найдена.</p>';
         }
-            try {
-                const response = await fetch(`http://localhost:8000/api/v1/health`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        token: accessToken
-                    })
-                });
-                if (!response.ok) {
-                    throw new Error('Ошибка при получении ответа ОТ HEALTH');
-                }
-                const data = await response.json();
-                localStorage.setItem('big_photo', data.photo_max_orig);
-                userInfoDiv.innerHTML = `
-                    <img src="${data.photo_max_orig}" alt="Hint Avatar" class="hint-avatar">
-                `;
+        try {
+            const accessToken = localStorage.getItem('vk_token');
+            const userId = localStorage.getItem("user_id");
+            const response = await fetch(`http://localhost:8000/api/v1/user/health?user_id=${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    token: accessToken
+                })
+            });
+            if (!response.ok) {
+                throw new Error('Ошибка при получении ответа ОТ HEALTH');
             }
+            const data = await response.json();
+            const user = userInfo.response[0];
+            localStorage.setItem('big_photo', data.photo_max_orig);
+            userInfoDiv.innerHTML = `
+                <p><strong>Имя:</strong> ${user.first_name || 'Неизвестно'} ${user.last_name || 'Неизвестно'}</p>
+                <p><strong>Пол:</strong> ${user.sex === 1 ? 'Женский' : user.sex === 2 ? 'Мужской' : 'Неизвестно'}</p>
+                <p><strong>Дата рождения:</strong> ${user.bdate ? formatBirthdate(user.bdate) : 'Неизвестно'}</p>
+                <p><strong>Город:</strong> ${user.city ? user.city.title : 'Неизвестно'}</p>
+                <p><strong>Образование:</strong> ${user.university_name || 'Неизвестно'}</p>
+                <img src="${data.photo_max_orig}" alt="Hint Avatar" class="hint-avatar">
+            `;
+        } catch (error) {
+            console.error('Ошибка:', error);
+
+        }
     });
 
     function formatBirthdate(bdate) {
