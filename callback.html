@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Callback</title>
+    <link rel="stylesheet" href="./assets/styles/normalize.css">
+    <link rel="stylesheet" href="./assets/styles/style.css">
+</head>
+<body>
+<script>
+    async function getAccessToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        console.log("Code:", code);
+        if (code) {
+            try {
+                const response = await fetch(`https://opazjuhet5.ru/api/v1/token/get_access_token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch access token');
+                }
+
+                const data = await response.json();
+                console.log('Access Token:', data.access_token);
+
+                // Сохранение токена во временную переменную
+                window.accessToken = data.access_token;
+                window.vkId = data.user_id;
+                window.expires_in = data.expires_in;
+
+                // Показ формы для ввода пароля (только для регистрации)
+                document.getElementById('register-form').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error during access token retrieval:', error);
+            }
+        } else {
+            console.error('Code not found in URL');
+        }
+    }
+
+    async function registerUser(event) {
+        event.preventDefault();
+
+        const password = document.getElementById('password').value;
+
+        const response = await fetch(`https://opazjuhet5.ru/api/v1/auth/register_vk`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                access_token: window.accessToken,
+                vk_id: window.vkId,
+                password: password,
+                expires_in: window.expires_in
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            alert(data.message);
+
+            // Сохранение данных пользователя в localStorage
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('avatar_url', data.avatar_url);
+            const tokenExpiryTime = new Date().getTime() + (data.expires_in * 1000);
+            localStorage.setItem('token_expiry', tokenExpiryTime.toString());
+            localStorage.setItem('vk_token', data.access_token);
+
+            // Перенаправление на index.html
+            window.location.href = 'index.html';
+        } else {
+            const errorData = await response.json();
+            alert('Error: ' + errorData.detail);
+        }
+    }
+    getAccessToken()
+</script>
+
+<div class="container-callback">
+    <img src="./assets/images/lologo.svg" alt="logo" class="logo-center">
+    <!-- Форма для ввода пароля (только для регистрации) -->
+    <form id="register-form" onsubmit="registerUser(event)" style="display: none;">
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <button type="submit" class="header__button-signUp">Submit</button>
+    </form>
+</div>
+</body>
+</html>

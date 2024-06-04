@@ -1,0 +1,360 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(30deg, #8f28b174, #400cf960);
+}
+
+a {
+  text-decoration: none;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.header__naming {
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
+}
+
+.logo {
+  width: 150px;
+  height: 150px;
+}
+
+.header__button {
+  display: flex;
+  flex-direction: row;
+  margin-top: 25px;
+  margin-right: 20px;
+  align-items: center;
+}
+
+.header__button-signUp {
+  width: auto;
+  padding: 10px 10px 10px 10px;
+  margin-right: 10px;
+  background-color: #ffffff;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.sign {
+  color: rgb(0, 0, 0);
+}
+
+.sign:hover {
+  color: rgb(169, 169, 169);
+}
+
+.header__button-login {
+  width: auto;
+  padding: 10px;
+  border: 2px #ffffff solid;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.login {
+  color: #000000;
+}
+
+.login:hover {
+  color: #838383;
+}
+
+.main {
+  display: flex;
+  height: 80vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-text {
+  margin-bottom: 30px;
+  color: rgb(255, 255, 255);
+  font-size: 50px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.main__form {
+  display: flex;
+  align-items: center;
+}
+
+.linkInput {
+  width: 50vw;
+  height: 40px;
+  border: 1px white solid;
+  font-size: 26px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.main_button {
+  padding: 11px 10px 9px 10px;
+  color: rgb(0, 0, 0);
+  background-color: #ffffff;
+  border: none;
+  font-size: 21px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 100;
+}
+
+.main_button:hover {
+  color: rgb(240, 240, 240);
+  background-color: #b3afaf;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: end;
+  margin-bottom: 40px;
+}
+
+.footer div {
+  margin-left: 15px;
+}
+
+.about {
+  color: #000000;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.git {
+  color: #000000;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.contact {
+  color: #000000;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.container-form{
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(30deg, #3c1564, #6a6a6a);
+  justify-content: center;
+  align-items: center;
+}
+
+.card-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30vw;
+  height: 75vh;
+  border: 2px rgb(255, 255, 255) solid;
+  background-color: #ffffff;
+}
+
+.card__logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5% 0 5% 0;
+}
+
+.logo-img {
+  width: 120px;
+  height: 120px;
+}
+
+.card_vk {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 7%;
+}
+
+.button-vk {
+  width: 20vw;
+  height: 50px;
+  border: none;
+  color: rgb(255, 255, 255);
+  background-color: #475bee;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.button-vk:hover {
+  background-color: #5d70fb;
+}
+
+.card__autorization {
+  display: flex;
+  flex-direction: column;
+  width: 20vw;
+  margin-bottom: 5%;
+}
+
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 20vw;
+}
+
+.card__autorization_login {
+  display: flex;
+  margin-top: 5%;
+}
+
+.input-login {
+  width: 20vw;
+  height: 35px;
+  border: #acacac 1px solid;
+  font-size: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.card__autorization_password {
+  margin: 5% 0 5% 0;
+  width: 20vw;
+}
+
+.input-password {
+  width: 20vw;
+  height: 30px;
+  border: #acacac 1px solid;
+  font-size: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.card__continue {
+  margin-bottom: 10px;
+}
+
+.button-continue {
+  width: 20vw;
+  height: 50px;
+  border: none;
+  color: white;
+  background-color: #534981;
+  font-size: 1.5em;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.button-continue:hover {
+  color: #9b97ac;
+}
+
+.card__text {
+  color: #a4a4a4;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.card-link:hover {
+  color: #213a96;
+}
+
+::placeholder {
+  text-align: center;
+}
+
+.footer-link {
+  transition: color 0.5s font-size 0.5s;
+}
+
+.footer-link:hover {
+  color: #606060;
+  font-size: 18px;
+}
+
+.footer-link-container {
+  transition: background-color 0.5s;
+}
+
+.footer-link-container:hover {
+  animation: shake-grow 0.5s infinite, color-change 0.5s infinite;
+}
+
+@keyframes shake-grow {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.8); }
+  50% { transform: rotate(-15deg) scale(2); }
+  75% { transform: rotate(15deg) scale(1.8); }
+}
+
+@keyframes color-change {
+  0% { background-color: #ff0000; }
+  25% { background-color: #00ff00; }
+  50% { background-color: #0000ff; }
+  75% { background-color: #ffff00; }
+  100% { background-color: #ff00ff; }
+}
+
+#password {
+  width: 20vw;
+  height: 35px;
+  border: 1px gray solid;
+  font-size: 1em;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.container-callback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(30deg, #8f28b174, #400cf960);
+}
+
+.logo-center {
+  width: 300px;
+  height: 300px;
+  margin-top: 20vh;
+}
+
+.header__user-info {
+  text-align: center;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+}
+
+#information {
+  text-align: center;
+}
+
+.main-container {
+  display: flex;
+}
+
+.user-info {
+  margin-left: 5%;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.header-info {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}
+
+.gigachat-response {
+  width: 40%;
+  color: #000000;
+  background-color: #cc82d1;
+  margin-left: 5%;
+  font-size: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 5%;
+}

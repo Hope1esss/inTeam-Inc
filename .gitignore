@@ -29,6 +29,7 @@ MANIFEST
 # PyInstaller
 *.manifest
 *.spec
+discord.xml
 
 # Installer logs
 pip-log.txt
@@ -92,7 +93,6 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-*.env
 .env
 .venv
 env/

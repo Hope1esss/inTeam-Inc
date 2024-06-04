@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./assets/styles/normalize.css">
+    <link rel="stylesheet" href="./assets/styles/style.css">
+</head>
+<body>
+<div class="container-form">
+    <div class="card-login">
+        <form id="loginForm">
+            <div class="card__logo">
+                <div class="card__logo-img"><img src="./assets/images/lologo.svg" alt="logo" class="logo-img"></div>
+            </div>
+            <div class="card_vk"><button type="button" class="button-vk" id="vk-login-btn">Продолжить через ВК</button></div>
+            <div class="card__autorization">
+                <div class="card__autorization_login"><label for="username"></label><input type="text" placeholder="Логин" id="username" class="input-login" required></div>
+                <div class="card__autorization_password"><label for="password"></label><input type="password" placeholder="Пароль" id="password" class="input-password" required></div>
+            </div>
+            <div class="card__continue"><button type="submit" class="button-continue">Продолжить</button></div>
+            <div class="card__text">Нет аккаунта? <a href="sign.html" class="card-link">Зарегистрируйтесь</a></div>
+            <div id="message" style="color: red"></div>
+        </form>
+    </div>
+</div>
+<script type="module" src="auth.js"></script>
+<script type="module" src="login.js"></script>
+</body>
+</html>
